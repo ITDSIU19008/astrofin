@@ -946,21 +946,21 @@ st.markdown(
     
     /* Thay đổi màu nền của table */
     .custom-table {
-        background-color: rgba(240, 242, 246, 0.5);  /* Màu nền của bảng */
-        color: black;  /* Màu chữ cho tiêu đề cột */
+        # background-color: rgba(240, 242, 246, 0.5);  /* Màu nền của bảng */
+        # color: black;  /* Màu chữ cho tiêu đề cột */
         border-collapse: collapse;
         width: 99%;
         text-align: left;
     }
     .custom-table th {
         # background-color: rgba(98, 102, 166, 0.1);  /* Màu nền cho tiêu đề cột */
-        color: #7f6d84;  /* Màu chữ cho tiêu đề cột */
+        # color: #7f6d84;  /* Màu chữ cho tiêu đề cột */
         text-align: left;
         padding: 4px;
     }
     .custom-table td {
         # background-color: rgba(98, 102, 166, 0.1);  /* Màu nền cho các hàng */
-        color: black;  /* Màu chữ cho các hàng */
+        # color: black;  /* Màu chữ cho các hàng */
         padding: 4px;
     }
     # .custom-table tr:nth-child(even) {
