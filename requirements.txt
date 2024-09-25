@@ -1,0 +1,7 @@
+pandas
+swisseph
+pyswisseph
+pytz
+streamlit
+timezonefinder
+geopy

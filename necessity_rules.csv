@@ -1,0 +1,9 @@
+Product,Condition
+SettingBudget,scores['Impulsive'] > 3.5 and scores['Caution'] < 2.8
+Credit_Card,scores['Impulsive'] > 3.45 and scores['Adventurous'] > 3.0 and scores['Conservative'] < 2.5
+Insurance,scores['Impulsive'] > 3.5 or scores['Caution'] < 3.0
+TermDeposit,scores['Adventurous'] < 4.0 or scores['Impulsive'] > 3.0
+Money_Pot,scores['Impulsive'] > 3.45 and scores['Caution'] < 3.0
+SchedulePayment,scores['Convenience'] > 4.0 and scores['Caution'] < 3.0
+Tags,scores['Caution'] > 3.5 and scores['Analytical'] > 3.0
+Split_bill,scores['Convenience'] > 3.5
