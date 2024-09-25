@@ -941,7 +941,7 @@ st.markdown(
 
     /* Thay đổi màu nền của expander */
     [data-testid="stExpander"] {
-        background-color: rgba(240, 242, 246, 0.5); /* Thay đổi thành màu bạn muốn */
+        # background-color: rgba(240, 242, 246, 0.5); /* Thay đổi thành màu bạn muốn */
     }
     
     /* Thay đổi màu nền của table */
