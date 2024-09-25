@@ -1,7 +1,10 @@
+matplotlib
+numpy
 pandas
 swisseph
-pyswisseph
+geopy
 pytz
 streamlit
 timezonefinder
-geopy
+scikit-learn
+plotly
