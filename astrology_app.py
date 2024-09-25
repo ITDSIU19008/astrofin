@@ -1289,15 +1289,15 @@ if st.sidebar.button("✨Calculate✨"):
     
         else:
             st.subheader("Your matches:")
-            eligible_df['Score'] = eligible_df['score'].round(2)  
+            eligible_df['Score'] = eligible_df['Score'].round(2)  
             st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
     
             st.subheader("You will need: ")
-            necessary_df['Score'] = necessary_df['score'].round(2)  
+            necessary_df['Score'] = necessary_df['Score'].round(2)  
             st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
     
             st.subheader("All Products")
-            all_products_df['Score'] = all_products_df['score'].round(2) 
+            all_products_df['Score'] = all_products_df['Score'].round(2) 
             st.markdown(all_products_df.to_html(classes='custom-table'), unsafe_allow_html=True)
     
 
