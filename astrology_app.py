@@ -1276,26 +1276,27 @@ if st.sidebar.button("✨Calculate✨"):
     with tab3:
         if language == "Tiếng Việt":
             st.subheader("Bạn sẽ thích: ")
-            eligible_df['score'] = eligible_df['score'].round(2)  # Làm tròn cột score
+            # with st.expander("Bạn sẽ thích: "):
+                # st.table(eligible_df)
             st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
+
             st.subheader("Bạn sẽ cần: ")
-            necessary_df['score'] = necessary_df['score'].round(2)  # Làm tròn cột score
+            # st.table(necessary_df)
             st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
+
             st.subheader("Tất cả sản phẩm")
-            all_products_df['score'] = all_products_df['score'].round(2)  # Làm tròn cột score
+            # st.table(all_products_df)
             st.markdown(all_products_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
         else:
-            st.subheader("Your matches:")
-            eligible_df['score'] = eligible_df['score'].round(2)  # Làm tròn cột score
+            st.subheader("Your matchs:")
+            # st.table(eligible_df)
             st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
+
             st.subheader("You will need: ")
-            necessary_df['score'] = necessary_df['score'].round(2)  # Làm tròn cột score
+            # st.table(necessary_df)
             st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
+
             st.subheader("All Products")
-            all_products_df['score'] = all_products_df['score'].round(2)  # Làm tròn cột score
+            # st.table(all_products_df)
             st.markdown(all_products_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+
