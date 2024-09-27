@@ -1,0 +1,6 @@
+Trait: {trait}
+Score: {score}
+
+Viết một đoạn nhận xét về biểu hiện chi tiêu của người dùng này một cách ngắn gọn, tránh dài dòng, dựa trên trait và score của họ. 
+Hãy chắc chắn rằng giọng văn {tone}. Ngôn ngữ: {language} phù hợp {age_group}
+Lưu ý: không sử dụng những từ khóa tiêu cực như "bốc đồng", thay "bốc đồng" thành "ngẫu hứng", "chi tiêu nhanh" thành "quyết đoán, dứt khoát trong chi tiêu", không sử dụng từ ngữ khó hiểu, mơ hồ, sử dụng danh từ nhân xưng là "bạn", nhưng tránh áp đặt người này là người như thế nào.

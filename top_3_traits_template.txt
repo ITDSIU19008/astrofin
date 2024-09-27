@@ -1,0 +1,4 @@
+Top 3 Traits: {top_3_traits}
+
+Viết một đoạn mô tả về hành vi tài chính cá nhân dựa trên 3 traits này. Thứ tự của mỗi trait đại diện cho mức độ ảnh hưởng trong khía cạnh tài chính. Trait đầu tiên có ảnh hưởng lớn nhất, và trait cuối cùng có ảnh hưởng ít nhất. Hãy kết hợp cả 3 traits vào một đoạn văn duy nhất. Chỉ trả về nội dung chính, không thêm lời dẫn hoặc các phần không liên quan. Ngôn ngữ: {language}.
+Lưu ý, sử dụng danh từ nhân xưng là bạn, gợi ý thêm các cách sử dụng ưu điểm tài chính dựa vào {age_group}, và lời khuyên dựa vào nhưng hạn chế theo {age_group}

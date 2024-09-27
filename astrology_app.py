@@ -13,6 +13,10 @@ import os
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import plotly.graph_objects as go
+import json
+import openai
+import hashlib
+
 
 # Đường dẫn tương đối tới thư mục ephemeris (trong cùng thư mục với file Python chính)
 relative_ephe_path = os.path.join(os.path.dirname(__file__), 'sweph')
@@ -570,69 +574,120 @@ def plot_radar_chart(final_scores, average_scores):
 
 # ---------------------NHẬN XET---------------------------------
 # Hàm lấy nhận xét dựa trên điểm số và trait
-def load_financial_traits_descriptions(traits_descriptions_path):
-    return pd.read_csv(traits_descriptions_path)
+# Đặt API key của OpenAI
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Đường dẫn tới file CSV chứa mô tả về các đặc điểm tài chính
-traits_descriptions_path = 'financial_traits_descriptions.csv'
-
-# Đọc dữ liệu từ file CSV vào DataFrame
-descriptions_df = load_financial_traits_descriptions(traits_descriptions_path)
-
-# Thêm tùy chọn chọn ngôn ngữ
+# Hàm gọi GPT để sinh nội dung dựa trên input
 language = st.selectbox("Chọn ngôn ngữ / Language settings", ["Tiếng Việt", "English"])
+def generate_content_with_gpt(prompt, model="gpt-4o-mini", max_tokens=500):
+    try:
+        # neu version new 
+        response = openai.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=max_tokens,
+            temperature=0.7 
+        )
+        # Lấy nội dung phản hồi từ GPT
+        print(response)
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Lỗi: {e}")
+        return None
 
-# Hàm để lấy mô tả theo điểm số dựa trên ngôn ngữ
-def get_trait_description(trait, score, descriptions_df, language):
-    for _, row in descriptions_df.iterrows():
-        trait_name = row['Trait']
-        if trait_name == trait:
-            score_range = row['Score Range']
-            min_score, max_score = map(float, score_range.split('-'))
-            if min_score <= score <= max_score:
-                if language == "Tiếng Việt":
-                    return row['Description_vi']
-                else:
-                    return row['Description_en']
-    return "Không có mô tả phù hợp cho trait này." if language == "Tiếng Việt" else "No suitable description for this trait."
+# Hàm để đọc prompt từ file .txt
+def load_prompt_from_file(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except FileNotFoundError:
+        print(f"File {file_path} không tồn tại.")
+        return None
 
-# Hàm để lấy nhận xét tổng quan dựa trên top 3 traits
-def get_top_traits_description(top_3_traits, descriptions_df, language):
-    user_top_traits = '-'.join(top_3_traits).strip().lower().replace('–', '-')   
-    print(f"User Traits: {user_top_traits}")  # In ra giá trị của user_top_traits   
-    for _, row in descriptions_df.iterrows():
-        csv_top_traits = row['Top_3_traits'].strip().lower().replace('–', '-').replace(' ', '') 
-        # print(f"CSV Traits: {csv_top_traits}")  # In ra giá trị của csv_top_traits
-        if csv_top_traits == user_top_traits:
-            if language == "Tiếng Việt":
-                return row['top_traits_description_vi']
-            else:
-                return row['top_traits_description_en']
+# Create a hash based on user information (birth date, time, and place)
+def generate_user_hash(birth_date, birth_time, birth_place):
+    unique_string = f"{birth_date}_{birth_time}_{birth_place}"
+    user_hash = hashlib.md5(unique_string.encode()).hexdigest()
+    return user_hash
+
+# Hàm để tính toán độ tuổi từ ngày sinh
+def calculate_age(birth_date):
+    today = datetime.today()
+    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+    return age
+
+# Hàm điều chỉnh giọng văn dựa trên độ tuổi
+def adjust_tone_based_on_age(age):
+    if age < 6:
+        return "giọng văn nhẹ nhàng và dễ hiểu dành cho trẻ nhỏ", "nhỏ tuổi"
+    elif 6 <= age < 19:
+        return "giọng văn thân thiện và gần gũi cho lứa tuổi học sinh", "học sinh"
+    elif 19 <= age < 26:
+        return "giọng văn năng động và hợp thời, phù hợp với sinh viên", "sinh viên"
+    elif 26 <= age < 41:
+        return "giọng văn chuyên nghiệp và cụ thể, phù hợp với người đang đi làm", "đang đi làm"
+    else:
+        return "giọng văn trang trọng và rõ ràng, dành cho người lớn tuổi", "lớn tuổi"
+
+# Hàm để sinh mô tả trait dựa trên GPT và độ tuổi
+def get_trait_description_with_gpt(trait, score, language, age):
+    # Đọc prompt từ file
+    prompt_template = load_prompt_from_file('prompt_template.txt')
     
-    return "Không có mô tả cho tổ hợp traits này." if language == "Tiếng Việt" else "No description for this combination of traits."
+    # Kiểm tra nếu không có prompt nào
+    if prompt_template is None:
+        return "Không có mô tả hợp lệ."
+    
+    # Điều chỉnh giọng văn và nhóm tuổi dựa trên độ tuổi
+    tone, age_group = adjust_tone_based_on_age(age)
+    
+    # Tạo prompt bằng cách thay thế các biến
+    prompt = prompt_template.format(trait=trait, score=score, language=language, tone=tone, age_group=age_group)
+    
+    # Gọi GPT để sinh nội dung
+    return generate_content_with_gpt(prompt)
+
+# Hàm để sinh mô tả top 3 traits dựa trên GPT và độ tuổi
+def get_top_traits_description_with_gpt(top_3_traits, language, age):
+    # Đọc prompt từ file (giả sử bạn có một file riêng cho top 3 traits)
+    prompt_template = load_prompt_from_file('top_3_traits_template.txt')
+    
+    # Kiểm tra nếu không có prompt nào
+    if prompt_template is None:
+        return "Không có mô tả hợp lệ."
+    
+    # Điều chỉnh giọng văn và nhóm tuổi dựa trên độ tuổi
+    tone, age_group = adjust_tone_based_on_age(age)
+    
+    # Tạo prompt bằng cách thay thế các biến
+    prompt = prompt_template.format(top_3_traits=', '.join(top_3_traits), language=language, tone=tone, age_group=age_group)
+    
+    # Gọi GPT để sinh nội dung
+    return generate_content_with_gpt(prompt)
+
+# Hàm để lọc và lấy nội dung cần thiết từ phản hồi GPT (nếu cần)
+def extract_content_from_gpt_response(response):
+    # Giả sử bạn muốn lấy nội dung sau tiêu đề "Mô tả:"
+    match = re.search(r"Mô tả:\s*(.+)", response)
+    if match:
+        return match.group(1)  # Lấy phần nội dung sau "Mô tả:"
+    return response  # Nếu không có tiêu đề, trả về toàn bộ phản hồi
 
 # Hàm để tính top 3 traits dựa trên final_scores
 def get_top_3_traits(final_scores):
     # Sắp xếp final_scores theo giá trị (điểm) giảm dần và lấy ra 3 trait đầu tiên
-    sorted_traits = sorted(final_scores, key=final_scores.get, reverse=True)
-    return sorted_traits[:3]  # Trả về 3 traits có điểm cao nhất
-# Hàm để lấy trait cao nhất và thấp nhất
+    sorted_traits = sorted(final_scores.items(), key=lambda x: x[1], reverse=True)
+    return [trait for trait, _ in sorted_traits[:3]]  # Trả về 3 traits có điểm cao nhất
 
+
+# Hàm để lấy trait cao nhất và thấp nhất
 def get_highest_and_lowest_trait(final_scores):
     sorted_traits = sorted(final_scores.items(), key=lambda x: x[1], reverse=True)
     highest_trait = sorted_traits[0][0]  # Trait có điểm cao nhất
     lowest_trait = sorted_traits[-1][0]  # Trait có điểm thấp nhất
     return highest_trait, lowest_trait
-
-# Hàm để tạo nhận xét dựa trên trait cao nhất và thấp nhất
-def get_highest_and_lowest_description(highest_trait, lowest_trait, descriptions_df, language):
-    for _, row in descriptions_df.iterrows():
-        if row['Highest_Trait'] == highest_trait and row['Lowest_Trait'] == lowest_trait:
-            if language == "Tiếng Việt":
-                return row['Description_vi_fallback']
-            else:
-                return row['Description_en_fallback']
-    return "Không có mô tả liên quan cho sự kết hợp này." if language == "Tiếng Việt" else "No related description for this combination."
 
 
 # -----------------HỆ THỐNG ĐIỂM PRODUCT-----------------------------------------------------------------------
@@ -774,6 +829,32 @@ def get_final_product_scores(final_scores, product_keywords, keyword_to_trait_ma
     # Điều chỉnh gán nhãn theo ngôn ngữ
     product_info = assign_labels_using_kmeans(product_info, language=language)
     return product_info
+#--------------------------------RATE APP-----------------------------------------------
+
+# Hàm lưu đánh giá vào file JSON
+def save_feedback(stars, comment, language):
+    feedback_data = {
+        "rating": stars,
+        "comment": comment,
+        "language": language,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    
+    # Tạo file nếu chưa có, hoặc ghi vào file có sẵn
+    try:
+        with open("feedback.json", "r+") as file:
+            data = json.load(file)
+            data.append(feedback_data)
+            file.seek(0)
+            json.dump(data, file, indent=4)
+    except FileNotFoundError:
+        with open("feedback.json", "w") as file:
+            json.dump([feedback_data], file, indent=4)
+
+# Lưu trạng thái khi nhấn nút Calculate bằng session state
+if "calculate_pressed" not in st.session_state:
+    st.session_state.calculate_pressed = False
+
 # ----------------------------Streamlit UI---------------------------------------------
 
 # Streamlit UI
@@ -1002,6 +1083,7 @@ else:
 
 # Nhập ngày sinh
 birth_date = st.sidebar.date_input(date_label, min_value=datetime(1700, 1, 1), max_value=datetime.today())
+age = calculate_age(birth_date)
 
 st.sidebar.markdown(
     f'<p style="color:white;">{text}</p>',
@@ -1054,250 +1136,371 @@ else:
 
 # Khi nhấn nút "Calculate"
 if st.sidebar.button("✨Calculate✨"):
-    lat, lon, timezone = get_location_and_timezone(birth_place)
-    positions = get_planet_positions(birth_date.year, birth_date.month, birth_date.day, hour, minute, lat, lon, timezone)
-    ascendant, houses = calculate_houses_and_ascendant(birth_date.year, birth_date.month, birth_date.day, hour, minute, lat, lon, timezone)
-
-    # Tạo danh sách individual_planets từ kết quả positions
-    individual_planets = [(planet, get_zodiac_sign_and_degree(degree)[0]) for planet, degree in positions.items()]
-
-    # Hiển thị bảng vị trí các hành tinh với House Cup và House Ruler (bao gồm cả Ascendant)
-    df_positions = create_astrology_dataframe(positions, houses, ascendant)
-    df_houses = create_house_dataframe(houses, ascendant)
-
-    # Tính toán và hiển thị bảng các góc aspect
-    aspects = calculate_aspects(positions)
-    aspect_degree_mapping = {
-    'Conjunction': 0,
-    'Sextile': 60,
-    'Square': 90,
-    'Trine': 120,
-    'Quincunx': 150,
-    'Opposition': 180
-}
-    # Tạo DataFrame cho các góc hợp (aspects)
-    df_aspects = create_aspects_dataframe(aspects, positions)
-
-
-    # Thay đổi cột Degree bằng cách ánh xạ Aspect
-    df_aspects['Degree'] = df_aspects['Aspect'].map(aspect_degree_mapping)
-    df_aspects['Degree'] = df_aspects['Degree'].apply(lambda x: f"{x}°")
-    # Hiển thị bảng đã cập nhật với các cột theo thứ tự mong muốn
-    df_aspects = df_aspects[['Planet 1', 'Zodiac Sign 1', 'Aspect', 'Degree', 'Planet 2', 'Zodiac Sign 2']]
-   
-   
-   
-    # Tính toán các đặc điểm tài chính
-    formatted_aspects = format_aspects({'Aspects': str(aspects)}, individual_planets)
-    relevant_planets = [planet for planet, sign in individual_planets]  # Chỉ lấy tên các hành tinh
-    extracted_aspects = extract_relevant_aspects(formatted_aspects, relevant_planets)
-
-    final_scores = calculate_financial_traits(individual_planets, formatted_aspects)
-    average_scores = {trait: 3.0 for trait in final_scores.keys()}  # Ví dụ tất cả trung bình là 3.0
-
-    final_product_scores = calculate_product_scores_numpy(final_scores, product_keywords, keyword_to_trait_mapping)
-
-    # Sử dụng KMeans clustering để gán nhãn
-    labeled_product_scores = assign_labels_using_kmeans(final_product_scores)
-
-    # Nhãn cho các trạng thái sản phẩm
-    label_names = {
-        "Tiếng Việt": {
-            "Very Suitable": "Rất phù hợp",
-            "Suitable": "Phù hợp",
-            "Little interest": "Ít quan tâm",
-            "Might not be interested": "Có thể không quan tâm"
-        },
-        "English": {
-            "Very Suitable": "Very Suitable",
-            "Suitable": "Suitable",
-            "Little interest": "Little interest",
-            "Might not be interested": "Might not be interested"
-        }
-    }
-
-    # Chọn ngôn ngữ hiện tại
-    current_language = language  # Hoặc "Tiếng Việt" hoặc "English"
-
-    # Phân loại sản phẩm theo Eligible và Necessary
-    eligible_products = [
-        (product, result['Score'], result['Label'].replace("Cần thiết - ", "").replace("Necessary - ", ""))
-        for product, result in labeled_product_scores.items() 
-    ]
-
-    necessary_products = [
-        (product, result['Score'], label_names[current_language].get(result['Label'], result['Label']))
-        for product, result in labeled_product_scores.items() if result['Necessary']
-    ]
-    
-
-    # Tạo DataFrame cho Eligible và Necessary Products
-    eligible_df = pd.DataFrame(eligible_products, columns=['Product', 'Score', 'Label'])
-    necessary_df = pd.DataFrame(necessary_products, columns=['Product', 'Score', 'Label'])
-
-    # Mức độ ưu tiên của các nhãn
-    priority = {
-        "Rất phù hợp": 1,
-        "Phù hợp": 2,
-        "Ít quan tâm": 3,
-        "Có thể không quan tâm": 4
-    } if current_language == "Tiếng Việt" else {
-        "Very Suitable": 1,
-        "Suitable": 2,
-        "Little interest": 3,
-        "Might not be interested": 4
-    }
-
-    def custom_sort(row):
-        label = row['Label']
-        if current_language == "Tiếng Việt":
-            if "Cần thiết" in label:
-                label_without_necessity = label.replace("Cần thiết - ", "")
-                return (2, priority.get(label_without_necessity, 5))  
-            else:
-                return (1, priority.get(label, 5))
-        elif current_language == "English":
-            if "Necessary" in label:
-                label_without_necessity = label.replace("Necessary - ", "")
-                return (2, priority.get(label_without_necessity, 5))
-            else:
-                return (1, priority.get(label, 5))
-
-
-    # Sắp xếp theo thứ tự ưu tiên và hiển thị cho các sản phẩm
-    eligible_df['Priority'] = eligible_df['Label'].map(priority)  
-    eligible_df = eligible_df.sort_values(by=['Priority', 'Score'], ascending=[True, False]).drop(columns='Priority').reset_index(drop=True)
-
-    necessary_df['Sort_Order'] = necessary_df.apply(custom_sort, axis=1)
-    necessary_df = necessary_df.sort_values(by=['Sort_Order', 'Score', 'Label'], ascending=[True, False, True]).drop(columns=['Sort_Order']).reset_index(drop=True)
-
-    # Tạo DataFrame cho tất cả các sản phẩm
-
-
-    # Sắp xếp và hiển thị cho tất cả các sản phẩm
-    all_products = [
-        (product, result['Score'], label_names[current_language].get(result['Label'], result['Label']))
-        for product, result in labeled_product_scores.items()
-    ]
-    all_products_df = pd.DataFrame(all_products, columns=['Product', 'Score', 'Label'])
-    all_products_df['Priority'] = all_products_df['Label'].apply(lambda x: 0 if x.startswith("Necessary - ") or x.startswith("Cần thiết - ") else 1)
-
-    all_products_df = all_products_df.sort_values(by=['Priority', 'Score'], ascending=[True, False]).drop(columns='Priority').reset_index(drop=True)
-    
-    
-    # Tạo các tab cho các phần khác nhau
-    tab1, tab2, tab3 = st.tabs(["Astrology", "Financial Traits", "Product Recommendations"])
-
-    # Tab 1: Hiển thị vị trí các hành tinh
-    with tab1:
-        st.write("### Planetary Positions:")
-        st.dataframe(df_positions)
-        st.write("### House Information:")
-        st.dataframe(df_houses)
-        st.write("### Planetary Aspects:")
-        st.dataframe(df_aspects)
-        
-
-    # Tab 2: Hiển thị Radar Chart cho các đặc điểm tài chính
-    with tab2:
+    if not birth_place:
+        # Hiển thị thông báo lỗi nếu chưa nhập địa điểm sinh
         if language == "Tiếng Việt":
-            st.write("### Biểu đồ dựa trên hành vi tài chính của bạn:")
+            st.sidebar.error("Bạn chưa nhập nơi sinh.")
         else:
-            st.write("### Financial Traits Radar Chart:")
+            st.sidebar.error("You haven't input your birth place.")
+    else:
+        lat, lon, timezone = get_location_and_timezone(birth_place)
+        positions = get_planet_positions(birth_date.year, birth_date.month, birth_date.day, hour, minute, lat, lon, timezone)
+        ascendant, houses = calculate_houses_and_ascendant(birth_date.year, birth_date.month, birth_date.day, hour, minute, lat, lon, timezone)
 
-        plot_radar_chart(final_scores, average_scores)
+        # Tạo danh sách individual_planets từ kết quả positions
+        individual_planets = [(planet, get_zodiac_sign_and_degree(degree)[0]) for planet, degree in positions.items()]
 
-        # Generate nhận xét từ tất cả các traits
-        if language == "Tiếng Việt":
-            st.write("### Mô tả về dựa trên tính cách:")
-        else:
-            st.write("### Trait Descriptions:")
-        
-        # Sắp xếp các traits theo điểm từ cao đến thấp
-        sorted_traits = sorted(final_scores.items(), key=lambda x: x[1], reverse=True)
-        
-        # Thêm phần mở đầu
-        # st.write("Bạn có các đặc điểm tài chính nổi bật như sau:" if language == "Tiếng Việt" else "You have the following prominent financial traits:")
+        # Hiển thị bảng vị trí các hành tinh với House Cup và House Ruler (bao gồm cả Ascendant)
+        df_positions = create_astrology_dataframe(positions, houses, ascendant)
+        df_houses = create_house_dataframe(houses, ascendant)
 
-        # Tạo đoạn văn bản mô tả tất cả các traits với số thứ tự
-        financial_traits_text = ""
-        trait_colors = {
-            "Adventurous": "blue",
-            "Convenience": "purple",
-            "Impulsive": "red",
-            "Conservative": "orange",
-            "Caution": "#f1d800",
-            "Analytical": "green"
+        # Tính toán và hiển thị bảng các góc aspect
+        aspects = calculate_aspects(positions)
+        aspect_degree_mapping = {
+        'Conjunction': 0,
+        'Sextile': 60,
+        'Square': 90,
+        'Trine': 120,
+        'Quincunx': 150,
+        'Opposition': 180
+    }
+        # Tạo DataFrame cho các góc hợp (aspects)
+        df_aspects = create_aspects_dataframe(aspects, positions)
+
+
+        # Thay đổi cột Degree bằng cách ánh xạ Aspect
+        df_aspects['Degree'] = df_aspects['Aspect'].map(aspect_degree_mapping)
+        df_aspects['Degree'] = df_aspects['Degree'].apply(lambda x: f"{x}°")
+        # Hiển thị bảng đã cập nhật với các cột theo thứ tự mong muốn
+        df_aspects = df_aspects[['Planet 1', 'Zodiac Sign 1', 'Aspect', 'Degree', 'Planet 2', 'Zodiac Sign 2']]
+    
+    
+    
+        # Tính toán các đặc điểm tài chính
+        formatted_aspects = format_aspects({'Aspects': str(aspects)}, individual_planets)
+        relevant_planets = [planet for planet, sign in individual_planets]  # Chỉ lấy tên các hành tinh
+        extracted_aspects = extract_relevant_aspects(formatted_aspects, relevant_planets)
+
+        final_scores = calculate_financial_traits(individual_planets, formatted_aspects)
+        average_scores = {trait: 3.0 for trait in final_scores.keys()}  # Ví dụ tất cả trung bình là 3.0
+
+        final_product_scores = calculate_product_scores_numpy(final_scores, product_keywords, keyword_to_trait_mapping)
+
+        # Sử dụng KMeans clustering để gán nhãn
+        labeled_product_scores = assign_labels_using_kmeans(final_product_scores)
+
+        # Nhãn cho các trạng thái sản phẩm
+        label_names = {
+            "Tiếng Việt": {
+                "Very Suitable": "Rất phù hợp",
+                "Suitable": "Phù hợp",
+                "Little interest": "Ít quan tâm",
+                "Might not be interested": "Có thể không quan tâm"
+            },
+            "English": {
+                "Very Suitable": "Very Suitable",
+                "Suitable": "Suitable",
+                "Little interest": "Little interest",
+                "Might not be interested": "Might not be interested"
+            }
         }
 
-        for index, (trait, score) in enumerate(sorted_traits):
-            if index == 0:
-                note = " - cao nhất" if language == "Tiếng Việt" else " - highest"
-            elif index == len(sorted_traits) - 1:
-                note = " - thấp nhất" if language == "Tiếng Việt" else " - lowest"
-            else:
-                note = ""
+        # Chọn ngôn ngữ hiện tại
+        current_language = language  # Hoặc "Tiếng Việt" hoặc "English"
 
-            # Lấy màu sắc dựa trên trait
-            color = trait_colors.get(trait.capitalize(), "black")  # Mặc định là "black" nếu không có trong trait_colors
+        # Phân loại sản phẩm theo Eligible và Necessary
+        eligible_products = [
+            (product, result['Score'], result['Label'].replace("Cần thiết - ", "").replace("Necessary - ", ""))
+            for product, result in labeled_product_scores.items() 
+        ]
 
-            description = get_trait_description(trait.capitalize(), score, descriptions_df, language)
+        necessary_products = [
+            (product, result['Score'], label_names[current_language].get(result['Label'], result['Label']))
+            for product, result in labeled_product_scores.items() if result['Necessary']
+        ]
+        
+
+        # Tạo DataFrame cho Eligible và Necessary Products
+        eligible_df = pd.DataFrame(eligible_products, columns=['Product', 'Score', 'Label'])
+        necessary_df = pd.DataFrame(necessary_products, columns=['Product', 'Score', 'Label'])
+
+        # Mức độ ưu tiên của các nhãn
+        priority = {
+            "Rất phù hợp": 1,
+            "Phù hợp": 2,
+            "Ít quan tâm": 3,
+            "Có thể không quan tâm": 4
+        } if current_language == "Tiếng Việt" else {
+            "Very Suitable": 1,
+            "Suitable": 2,
+            "Little interest": 3,
+            "Might not be interested": 4
+        }
+
+        def custom_sort(row):
+            label = row['Label']
+            if current_language == "Tiếng Việt":
+                if "Cần thiết" in label:
+                    label_without_necessity = label.replace("Cần thiết - ", "")
+                    return (2, priority.get(label_without_necessity, 5))  
+                else:
+                    return (1, priority.get(label, 5))
+            elif current_language == "English":
+                if "Necessary" in label:
+                    label_without_necessity = label.replace("Necessary - ", "")
+                    return (2, priority.get(label_without_necessity, 5))
+                else:
+                    return (1, priority.get(label, 5))
+
+
+        # Sắp xếp theo thứ tự ưu tiên và hiển thị cho các sản phẩm
+        eligible_df['Priority'] = eligible_df['Label'].map(priority)  
+        eligible_df = eligible_df.sort_values(by=['Priority', 'Score'], ascending=[True, False]).drop(columns='Priority').reset_index(drop=True)
+
+        necessary_df['Sort_Order'] = necessary_df.apply(custom_sort, axis=1)
+        necessary_df = necessary_df.sort_values(by=['Sort_Order', 'Score', 'Label'], ascending=[True, False, True]).drop(columns=['Sort_Order']).reset_index(drop=True)
+
+        # Tạo DataFrame cho tất cả các sản phẩm
+
+
+        # Sắp xếp và hiển thị cho tất cả các sản phẩm
+        all_products = [
+            (product, result['Score'], label_names[current_language].get(result['Label'], result['Label']))
+            for product, result in labeled_product_scores.items()
+        ]
+        all_products_df = pd.DataFrame(all_products, columns=['Product', 'Score', 'Label'])
+        all_products_df['Priority'] = all_products_df['Label'].apply(lambda x: 0 if x.startswith("Necessary - ") or x.startswith("Cần thiết - ") else 1)
+
+        all_products_df = all_products_df.sort_values(by=['Priority', 'Score'], ascending=[True, False]).drop(columns='Priority').reset_index(drop=True)
+        
+        
+        # Tạo các tab cho các phần khác nhau
+        # tab1, tab2, tab3, tab4 = st.tabs(["Astrology", "Financial Traits", "Product Recommendations", "Rating"])
+        # Thay đổi tên các tab theo ngôn ngữ
+        if language == "Tiếng Việt":
+            tab_titles = ["Biểu Đồ Sao", "Hành Vi Tài Chính", "Gợi Ý Các Sản Phẩm", "Đánh giá"]
+            rating_label = "Đánh giá ứng dụng từ 1 đến 5 sao"
+            comment_label = "Bình luận về ứng dụng"
+            feedback_message = "### Gửi nhận xét của bạn vào link sau: [https://chiemtinhlaso.com/]"
+        else:
+            tab_titles = ["Astrology", "Financial Traits", "Product Recommendations", "Feedback"]
+            rating_label = "Rate the app from 1 to 5 stars"
+            comment_label = "Comment on the app"
+            feedback_message = "### Submit your feedback through this link: [https://...]"
+
+
+        # Tạo tab với tên theo ngôn ngữ đã chọn
+        tabs = st.tabs(tab_titles)
+
+        # Tab 1: Hiển thị vị trí các hành tinh
+        with tabs[0]:
+            st.write("### Planetary Positions:")
+            st.dataframe(df_positions)
+            st.write("### House Information:")
+            st.dataframe(df_houses)
+            st.write("### Planetary Aspects:")
+            st.dataframe(df_aspects)
             
-            # Sử dụng HTML để thay đổi màu sắc của trait
-            financial_traits_text += f"{index + 1}. <b style='color:{color};'>{trait.capitalize()}</b> **({score:.3f}{note}):**\n\n {description}\n\n"
 
-        # Hiển thị toàn bộ đoạn văn bản
-        with st.expander("**Chi tiết các đặc điểm tài chính**" if language == "Tiếng Việt" else "**Financial traits**"):
-            st.markdown(financial_traits_text, unsafe_allow_html=True)
+        # Tab 2: Hiển thị Radar Chart cho các đặc điểm tài chính
+        # Sử dụng biến report_cache như biến toàn cục
+        if 'report_cache' not in st.session_state:
+            st.session_state.report_cache = {}
 
-        # Hiển thị mô tả cho top 3 traits
-        top_3_traits = get_top_3_traits(final_scores)
-        top_traits_description = get_top_traits_description(top_3_traits, descriptions_df, language)
+        with tabs[1]:
+            if language == "Tiếng Việt":
+                st.write("### Biểu đồ dựa trên hành vi tài chính của bạn:")
+            else:
+                st.write("### Financial Traits Radar Chart:")
 
-        # Hiển thị tiêu đề nhận xét tổng quát dựa trên ngôn ngữ được chọn
-        st.write("### Nhận xét về hành vi tài chính:" if language == "Tiếng Việt" else "### Financial behavior insights:")
+            plot_radar_chart(final_scores, average_scores)
 
-        # Sử dụng expander để ẩn/hiện phần nhận xét chi tiết
-        with st.expander("**Nhận xét chi tiết**" if language == "Tiếng Việt" else "**Detailed financial behavior insights:**"):
-            st.write(top_traits_description)
+            # Generate nhận xét từ tất cả các traits
+            if language == "Tiếng Việt":
+                st.write("### Mô tả về dựa trên tính cách:")
+            else:
+                st.write("### Trait Descriptions:")
+            
+            # Sắp xếp các traits theo điểm từ cao đến thấp
+            sorted_traits = sorted(final_scores.items(), key=lambda x: x[1], reverse=True)
+            
+            # Tạo biến thông báo spinner dựa trên ngôn ngữ
+            spinner_message = 'Đang tạo báo cáo... vui lòng chờ' if language == "Tiếng Việt" else 'Generating report... please wait'
 
-        # # Nhận xét về trait cao nhất và thấp nhất
-        # highest_trait, lowest_trait = get_highest_and_lowest_trait(final_scores)
-        # highest_lowest_description = get_highest_and_lowest_description(highest_trait, lowest_trait, descriptions_df, language)
+            # Nhận thông tin người dùng để tạo hash duy nhất
+            birth_date_str = birth_date.strftime("%Y-%m-%d")
+            birth_time_str = f"{hour:02}:{minute:02} {am_pm}"
+            birth_place_str = birth_place  # Nơi sinh
 
-        # st.write("### Nhận xét về sự kết hợp giữa trait cao nhất và thấp nhất:" if language == "Tiếng Việt" else "### Insights on the combination of highest and lowest trait:")
+            # Thêm phần mở đầu
+            # st.write("Bạn có các đặc điểm tài chính nổi bật như sau:" if language == "Tiếng Việt" else "You have the following prominent financial traits:")
+            # Tạo hash duy nhất dựa trên thông tin người dùng
+            user_hash = generate_user_hash(birth_date_str, birth_time_str, birth_place_str)
+
+            # Kiểm tra xem báo cáo đã tồn tại trong cache hay chưa
+            if user_hash in st.session_state.report_cache:
+                financial_traits_text, top_traits_description = st.session_state.report_cache[user_hash]
+
+                # Hiển thị lại nội dung từ cache
+                with st.expander("**Chi tiết các đặc điểm tài chính**" if language == "Tiếng Việt" else "**Financial traits**"):
+                    st.markdown(financial_traits_text, unsafe_allow_html=True)
+
+                st.write("### Nhận xét về hành vi tài chính:" if language == "Tiếng Việt" else "### Financial behavior insights:")
+                with st.expander("**Nhận xét chi tiết**" if language == "Tiếng Việt" else "**Detailed financial behavior insights:**"):
+                    st.write(top_traits_description)
+    
+            else:
+                # Tạo đoạn văn bản mô tả tất cả các traits với số thứ tự
+                financial_traits_text = ""
+                trait_colors = {
+                    "Adventurous": "blue",
+                    "Convenience": "purple",
+                    "Impulsive": "red",
+                    "Conservative": "orange",
+                    "Caution": "#f1d800",
+                    "Analytical": "green"
+                }
+                
+                with st.spinner(spinner_message):
+                    for index, (trait, score) in enumerate(sorted_traits):
+                        if index == 0:
+                            note = " - cao nhất" if language == "Tiếng Việt" else " - highest"
+                        elif index == len(sorted_traits) - 1:
+                            note = " - thấp nhất" if language == "Tiếng Việt" else " - lowest"
+                        else:
+                            note = ""
+
+                        # Lấy màu sắc dựa trên trait
+                        color = trait_colors.get(trait.capitalize(), "black")  # Mặc định là "black" nếu không có trong trait_colors
+
+                        description = get_trait_description_with_gpt(trait, score, language,age)
+                        
+                        # Sử dụng HTML để thay đổi màu sắc của trait
+                        financial_traits_text += f"{index + 1}. <b style='color:{color};'>{trait.capitalize()}</b> **({score:.3f}{note}):**\n\n {description}\n\n"
+
+                    # Hiển thị toàn bộ đoạn văn bản
+                    with st.expander("**Chi tiết các đặc điểm tài chính**" if language == "Tiếng Việt" else "**Financial traits**"):
+                        st.markdown(financial_traits_text, unsafe_allow_html=True)
+
+                    # Hiển thị mô tả cho top 3 traits
+                    top_3_traits = get_top_3_traits(final_scores)
+                    top_traits_description = get_top_traits_description_with_gpt(top_3_traits, language, age)
+                    # Lưu báo cáo vào cache với user_hash
+                    st.session_state.report_cache[user_hash] = (financial_traits_text, top_traits_description)
+
+                # Hiển thị tiêu đề nhận xét tổng quát dựa trên ngôn ngữ được chọn
+                st.write("### Nhận xét về hành vi tài chính:" if language == "Tiếng Việt" else "### Financial behavior insights:")
+
+                # Sử dụng expander để ẩn/hiện phần nhận xét chi tiết
+                with st.expander("**Nhận xét chi tiết**" if language == "Tiếng Việt" else "**Detailed financial behavior insights:**"):
+                    st.write(top_traits_description)
+
+
+        # Tab 4: Hiển thị sản phẩm được gợi ý (Eligible và Necessary Products)
+        with tabs[2]:
+            if language == "Tiếng Việt":
+                st.subheader("Bạn sẽ thích: ")
+                eligible_df['Score'] = eligible_df['Score'].round(2)
+                st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
         
-        # # Sử dụng expander để hiển thị nhận xét
-        # with st.expander("**Nhận xét chi tiết về sự kết hợp**" if language == "Tiếng Việt" else "**Detailed insights on the trait combination:**"):
-        #     st.write(highest_lowest_description)
+                st.subheader("Bạn sẽ cần: ")
+                necessary_df['Score'] = necessary_df['Score'].round(2) 
+                st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+        
+                st.subheader("Tất cả sản phẩm")
+                all_products_df['Score'] = all_products_df['Score'].round(2) 
+                st.markdown(all_products_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+        
+            else:
+                st.subheader("Your matches:")
+                eligible_df['Score'] = eligible_df['Score'].round(2)  
+                st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+        
+                st.subheader("You will need: ")
+                necessary_df['Score'] = necessary_df['Score'].round(2)  
+                st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+        
+                st.subheader("All Products")
+                all_products_df['Score'] = all_products_df['Score'].round(2) 
+                st.markdown(all_products_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+
+        # # Giao diện cho Tab Đánh giá (hoặc Feedback)
+        with tabs[3]:  # Tab Đánh giá/Feedback
+            st.header(tab_titles[3])  # Hiển thị tiêu đề Tab tương ứng với tên tab
+            st.write(feedback_message)  # Hiển thị link nhận xét
 
 
-    # Tab 4: Hiển thị sản phẩm được gợi ý (Eligible và Necessary Products)
-    with tab3:
-        if language == "Tiếng Việt":
-            st.subheader("Bạn sẽ thích: ")
-            eligible_df['Score'] = eligible_df['Score'].round(2)
-            st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+# *** Thêm phần Admin Access và Cache Management ***
+# Đặt mật khẩu admin
+ADMIN_PASSWORD = "admin123"  # Bạn có thể thay đổi mật khẩu này
+
+st.sidebar.subheader("              ")
+st.sidebar.subheader("              ")
+st.sidebar.subheader("              ")
+st.sidebar.subheader("              ")
+st.sidebar.subheader("              ")
+st.sidebar.subheader("              ")
+st.sidebar.subheader("              ")
+
+# Hàm kiểm tra đăng nhập admin
+def admin_access():
+    st.sidebar.subheader("Admin Access")
+    admin_password_input = st.sidebar.text_input("Enter Admin Password:", type="password")
     
-            st.subheader("Bạn sẽ cần: ")
-            necessary_df['Score'] = necessary_df['Score'].round(2) 
-            st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
-            st.subheader("Tất cả sản phẩm")
-            all_products_df['Score'] = all_products_df['Score'].round(2) 
-            st.markdown(all_products_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
+    if st.sidebar.button("Login as Admin"):
+        if admin_password_input == ADMIN_PASSWORD:
+            st.session_state['is_admin'] = True
+            st.sidebar.success("Logged in as Admin")
         else:
-            st.subheader("Your matches:")
-            eligible_df['Score'] = eligible_df['Score'].round(2)  
-            st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
-            st.subheader("You will need: ")
-            necessary_df['Score'] = necessary_df['Score'].round(2)  
-            st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
-            st.subheader("All Products")
-            all_products_df['Score'] = all_products_df['Score'].round(2) 
-            st.markdown(all_products_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-    
+            st.sidebar.error("Invalid Admin Password")
 
+# Hàm xóa cache dành cho admin
+def delete_cache_by_user_hash():
+    if 'report_cache' not in st.session_state:
+        st.session_state['report_cache'] = {}
+    
+    # Nhập user_hash để xóa cache
+    user_hash_input = st.sidebar.text_input("Enter User Hash to delete cache:")
+    
+    if st.sidebar.button("Delete Cache"):
+        if user_hash_input in st.session_state['report_cache']:
+            del st.session_state['report_cache'][user_hash_input]
+            st.sidebar.success(f"Cache for user_hash: {user_hash_input} has been deleted.")
+        else:
+            st.sidebar.warning(f"No cache found for user_hash: {user_hash_input}")
+
+# Hàm đăng xuất admin
+def admin_logout():
+    if st.sidebar.button("Logout"):
+        st.session_state['is_admin'] = False
+        st.sidebar.success("Logged out successfully.")
+
+# Kiểm tra xem admin đã đăng nhập chưa
+if 'is_admin' not in st.session_state:
+    st.session_state['is_admin'] = False
+
+# Giao diện cho admin sau khi đăng nhập
+if st.session_state['is_admin']:
+    # Thêm các tab cho admin quản lý
+    tab1, tab2 = st.tabs(["User Dashboard", "Admin Panel"])
+
+    # Tab hiển thị danh sách user_hash
+    with tab1:
+        st.subheader("Saved User Hashes")
+        if 'report_cache' in st.session_state:
+            if len(st.session_state['report_cache']) > 0:
+                for user_hash in st.session_state['report_cache'].keys():
+                    st.write(user_hash)
+            else:
+                st.write("No user hash found.")
+        else:
+            st.write("No user hash found.")
+    
+    # Tab admin panel để xóa cache và logout
+    with tab2:
+        st.subheader("Admin Panel")
+        delete_cache_by_user_hash()
+        admin_logout()
+else:
+    # Nếu chưa đăng nhập, hiển thị giao diện đăng nhập
+    admin_access()
