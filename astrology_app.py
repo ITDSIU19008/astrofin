@@ -1,11 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-# Kiểm tra nếu swisseph chưa được cài đặt, tự động cài đặt nó từ thư mục cục bộ
-try:
-    import swisseph
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "./lib/swisseph"])  # Đảm bảo đường dẫn đúng với thư mục chứa swisseph
+import swisseph as swe
 from datetime import datetime
 from geopy.geocoders import Nominatim
 import pytz
