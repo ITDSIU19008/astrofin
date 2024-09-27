@@ -2,9 +2,12 @@ matplotlib
 numpy
 pandas
 swisseph
+datetime
 geopy
 pytz
 streamlit
 timezonefinder
 scikit-learn
 plotly
+openai
+hashlib
