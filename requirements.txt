@@ -1,7 +1,6 @@
 matplotlib
 numpy
 pandas
--e ./swisseph
 datetime
 geopy
 pytz
