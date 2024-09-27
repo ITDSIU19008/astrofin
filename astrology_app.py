@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 import swisseph as swe
 from datetime import datetime
 from geopy.geocoders import Nominatim
