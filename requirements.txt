@@ -1,3 +1,5 @@
+swisseph
+pyswisseph
 matplotlib
 numpy
 pandas
@@ -10,3 +12,4 @@ scikit-learn
 plotly
 openai
 swisseph
+pyswisseph
