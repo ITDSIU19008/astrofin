@@ -9,3 +9,4 @@ timezonefinder
 scikit-learn
 plotly
 openai
+swisseph
