@@ -572,13 +572,21 @@ def plot_radar_chart(final_scores, average_scores):
     # Hiển thị biểu đồ trên Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
-# ---------------------NHẬN XET---------------------------------
+# ---------------------NHẬN XÉT---------------------------------
+# ____________________CHỌN NGÔN NGỮ__________________________
+languages = ["Tiếng Việt", "English"]
+
+# Thiết lập mặc định English
+default_language = "English"
+
+# Cho phép người dùng chọn ngôn ngữ
+language = st.selectbox("Chọn ngôn ngữ / Language settings", languages, index=languages.index(default_language))
+#----------------------CALL API-----------------------------------
 # Hàm lấy nhận xét dựa trên điểm số và trait
 # Đặt API key của OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Hàm gọi GPT để sinh nội dung dựa trên input
-language = st.selectbox("Chọn ngôn ngữ / Language settings", ["Tiếng Việt", "English"])
 def generate_content_with_gpt(prompt, model="gpt-4o-mini", max_tokens=500):
     try:
         # neu version new 
