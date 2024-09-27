@@ -1,7 +1,6 @@
 matplotlib
 numpy
 pandas
-swisseph
 datetime
 geopy
 pytz
@@ -10,3 +9,4 @@ timezonefinder
 scikit-learn
 plotly
 openai
+
