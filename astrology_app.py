@@ -639,6 +639,25 @@ def adjust_tone_based_on_age(age):
     else:
         return "giọng văn trang trọng và rõ ràng, dành cho người lớn tuổi", "lớn tuổi"
 
+def determine_score_level_and_description(trait, score):
+    if 1.00 <= score <= 1.80:
+        score_level = "rất thấp"
+        score_description = f"Người dùng gần như không có biểu hiện mạnh mẽ trong {trait}, cho thấy xu hướng rất thận trọng hoặc ít quan tâm đến khía cạnh này trong chi tiêu."
+    elif 1.81 <= score <= 2.60:
+        score_level = "thấp"
+        score_description = f"Người dùng có biểu hiện yếu trong {trait}, cho thấy họ có xu hướng tránh {trait} hoặc không thường xuyên thể hiện tính cách này trong các quyết định chi tiêu."
+    elif 2.61 <= score <= 3.40:
+        score_level = "trung bình"
+        score_description = f"Người dùng thể hiện sự cân bằng trong {trait}. Mặc dù {trait} không phải là đặc điểm nổi trội, nhưng họ có khả năng sử dụng nó trong một số quyết định chi tiêu nhất định."
+    elif 3.41 <= score <= 4.20:
+        score_level = "cao"
+        score_description = f"Người dùng có xu hướng thể hiện {trait} thường xuyên trong các quyết định chi tiêu, cho thấy họ có xu hướng mạnh mẽ về đặc điểm này."
+    else:
+        score_level = "rất cao"
+        score_description = f"Người dùng thể hiện {trait} một cách nổi bật, rất quyết đoán và mạnh mẽ, thường xuyên dựa vào đặc điểm này để đưa ra các quyết định chi tiêu."
+    
+    return score_level, score_description
+
 # Hàm để sinh mô tả trait dựa trên GPT và độ tuổi
 def get_trait_description_with_gpt(trait, score, language, age):
     # Đọc prompt từ file
@@ -650,9 +669,19 @@ def get_trait_description_with_gpt(trait, score, language, age):
     
     # Điều chỉnh giọng văn và nhóm tuổi dựa trên độ tuổi
     tone, age_group = adjust_tone_based_on_age(age)
-    
+    # Gọi hàm xác định mức độ điểm số và mô tả
+    score_level, score_description = determine_score_level_and_description(trait, score)
+
     # Tạo prompt bằng cách thay thế các biến
-    prompt = prompt_template.format(trait=trait, score=score, language=language, tone=tone, age_group=age_group)
+    prompt = prompt_template.format(
+        trait=trait,
+        score=score,
+        score_level=score_level,
+        score_description=score_description,
+        language=language,
+        tone=tone,
+        age_group=age_group
+    )
     
     # Gọi GPT để sinh nội dung
     return generate_content_with_gpt(prompt)
@@ -668,7 +697,9 @@ def get_top_traits_description_with_gpt(top_3_traits, language, age):
     
     # Điều chỉnh giọng văn và nhóm tuổi dựa trên độ tuổi
     tone, age_group = adjust_tone_based_on_age(age)
-    
+    # Gọi hàm xác định mức độ điểm số và mô tả
+    score_level, score_description = determine_score_level_and_description(trait, score)
+
     # Tạo prompt bằng cách thay thế các biến
     prompt = prompt_template.format(top_3_traits=', '.join(top_3_traits), language=language, tone=tone, age_group=age_group)
     
