@@ -1,6 +1,11 @@
 Trait: {trait}
 Score: {score}
 
-Viết một đoạn nhận xét về biểu hiện chi tiêu của người dùng này một cách ngắn gọn, tránh dài dòng, dựa trên trait và score của họ. 
-Hãy chắc chắn rằng giọng văn {tone}. Ngôn ngữ: {language} phù hợp {age_group}
-Lưu ý: không sử dụng những từ khóa tiêu cực như "bốc đồng", thay "bốc đồng" thành "ngẫu hứng", "chi tiêu nhanh" thành "quyết đoán, dứt khoát trong chi tiêu", không sử dụng từ ngữ khó hiểu, mơ hồ, sử dụng danh từ nhân xưng là "bạn", nhưng tránh áp đặt người này là người như thế nào.
+Viết một đoạn nhận xét ngắn gọn về hành vi chi tiêu của người dùng dựa trên đặc điểm tính cách {trait} và điểm số {score} dựa trên mức điểm {score_level}. {score_description}
+Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {age_group}.
+
+Hãy tránh sử dụng các từ khóa tiêu cực như "bốc đồng" và hãy viết theo phong cách thân thiện, gần gũi và không quá cứng nhắc.
+Mỗi khoảng điểm sẽ có một sắc thái riêng biệt, nhưng đừng làm cho nội dung quá công thức hoặc rập khuôn.
+
+Thay vì tập trung vào con số cụ thể, hãy tạo một đoạn văn gần gũi và thực tế để người đọc cảm thấy như đang được trò chuyện.
+Nhân xưng là "bạn", dùng chủ ngữ là "mình", không áp đặt người dùng là người như thế nào.
