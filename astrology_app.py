@@ -615,8 +615,8 @@ def load_prompt_from_file(file_path):
         return None
 
 # Create a hash based on user information (birth date, time, and place)
-def generate_user_hash(birth_date, birth_time, birth_place):
-    unique_string = f"{birth_date}_{birth_time}_{birth_place}"
+def generate_user_hash(birth_date, birth_time, birth_place, language):
+    unique_string = f"{birth_date}_{birth_time}_{birth_place}_{language}"
     user_hash = hashlib.md5(unique_string.encode()).hexdigest()
     return user_hash
 
@@ -1343,7 +1343,7 @@ if st.sidebar.button("✨Calculate✨"):
             # Thêm phần mở đầu
             # st.write("Bạn có các đặc điểm tài chính nổi bật như sau:" if language == "Tiếng Việt" else "You have the following prominent financial traits:")
             # Tạo hash duy nhất dựa trên thông tin người dùng
-            user_hash = generate_user_hash(birth_date_str, birth_time_str, birth_place_str)
+            user_hash = generate_user_hash(birth_date_str, birth_time_str, birth_place_str, language)
 
             # Kiểm tra xem báo cáo đã tồn tại trong cache hay chưa
             if user_hash in st.session_state.report_cache:
