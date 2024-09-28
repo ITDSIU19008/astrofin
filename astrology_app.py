@@ -1289,7 +1289,7 @@ if st.sidebar.button("✨Calculate✨"):
             tab_titles = ["Biểu Đồ Sao", "Hành Vi Tài Chính", "Gợi Ý Các Sản Phẩm", "Đánh giá"]
             rating_label = "Đánh giá ứng dụng từ 1 đến 5 sao"
             comment_label = "Bình luận về ứng dụng"
-            feedback_message = "### Gửi nhận xét của bạn vào link sau: [https://chiemtinhlaso.com/]"
+            feedback_message = "### Gửi nhận xét của bạn vào link sau: [https://...]"
         else:
             tab_titles = ["Astrology", "Financial Traits", "Product Recommendations", "Feedback"]
             rating_label = "Rate the app from 1 to 5 stars"
