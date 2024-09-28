@@ -1439,8 +1439,7 @@ if st.sidebar.button("✨Calculate✨"):
 
 
 # *** Thêm phần Admin Access và Cache Management ***
-# Đặt mật khẩu admin
-ADMIN_PASSWORD = "admin123"  # Bạn có thể thay đổi mật khẩu này
+ADMIN_PASSWORD = "admin123"  
 
 st.sidebar.subheader("              ")
 st.sidebar.subheader("              ")
@@ -1467,15 +1466,15 @@ def delete_cache_by_user_hash():
     if 'report_cache' not in st.session_state:
         st.session_state['report_cache'] = {}
     
-    # Nhập user_hash để xóa cache
-    user_hash_input = st.sidebar.text_input("Enter User Hash to delete cache:")
+    # Nhập user_hash để xóa cache (trong Tab 2)
+    user_hash_input = st.text_input("Enter User Hash to delete cache:")
     
-    if st.sidebar.button("Delete Cache"):
+    if st.button("Delete Cache"):
         if user_hash_input in st.session_state['report_cache']:
             del st.session_state['report_cache'][user_hash_input]
-            st.sidebar.success(f"Cache for user_hash: {user_hash_input} has been deleted.")
+            st.success(f"Cache for user_hash: {user_hash_input} has been deleted.")
         else:
-            st.sidebar.warning(f"No cache found for user_hash: {user_hash_input}")
+            st.warning(f"No cache found for user_hash: {user_hash_input}")
 
 # Hàm đăng xuất admin
 def admin_logout():
