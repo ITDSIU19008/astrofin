@@ -332,7 +332,7 @@ def calculate_financial_traits(individual_planets, formatted_aspects):
     selected_planets = ['Sun', 'Moon', 'Mercury', 'Mars', 'Venus', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']
     individual_planets = [(row['Planet'], row['Zodiac Sign']) for _, row in df_positions.iterrows() if row['Planet'] in selected_planets]
 
-    final_scores = {trait: 0 for trait in ['Adventurous', 'Convenience', 'Impulsive', 'Conservative', 'Caution', 'Analytical']}
+    final_scores = {trait: 0 for trait in ['Adventurous', 'Convenience', 'Impulsive', 'Conservative', 'Cautious', 'Analytical']}
 
     # Tính điểm dựa trên vị trí của các hành tinh và cung hoàng đạo
     for planet, sign in individual_planets:
@@ -357,7 +357,7 @@ def calculate_financial_traits(individual_planets, formatted_aspects):
     # print(f"Extracted Aspects: {aspects}")
     
      # Initialize scores
-    final_scores = {trait: 0 for trait in ['Adventurous', 'Convenience', 'Impulsive', 'Conservative', 'Caution', 'Analytical']}
+    final_scores = {trait: 0 for trait in ['Adventurous', 'Convenience', 'Impulsive', 'Conservative', 'Cautious', 'Analytical']}
 
     # Compute base scores from planets and zodiac signs
     for planet, sign in individual_planets:
@@ -1396,7 +1396,7 @@ if st.sidebar.button("✨Calculate✨"):
                     "Convenience": "purple",
                     "Impulsive": "red",
                     "Conservative": "orange",
-                    "Caution": "#f1d800",
+                    "Cautious": "#f1d800",
                     "Analytical": "green"
                 }
                 
