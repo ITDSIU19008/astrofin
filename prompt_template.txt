@@ -5,9 +5,8 @@ Viết một đoạn nhận xét ngắn gọn về hành vi chi tiêu của ngư
 Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {age_group}.Ngôn ngữ: {language}.
 
 Yêu cầu bổ sung:
-Liên kết giữa các trait: Mặc dù {trait} này được mô tả độc lập, hãy tạo sự liên kết tinh tế với các trait khác để đoạn văn có tính liền mạch, dù không có ngữ cảnh trước đó.
+Liên kết giữa các trait: Mặc dù {trait} này được mô tả độc lập, hãy tạo sự liên kết tinh tế để đoạn văn có tính liền mạch.
 Mở đầu mỗi đoạn với cấu trúc: "Với {score} thuộc mức {score_level} trong {trait},"
-Tạo sự chuyển tiếp tự nhiên: Dùng từ nối hoặc cụm từ để tạo cảm giác như mỗi trait liên kết với nhau một cách mạch lạc.
 
 Lưu ý:
 Mỗi {trait} chỉ viết 1 đoạn văn ngắn, không cách dòng.
