@@ -573,6 +573,7 @@ def plot_radar_chart(final_scores, average_scores):
     st.plotly_chart(fig, use_container_width=True)
 
 # ---------------------NHẬN XÉT---------------------------------
+# ---------------------NHẬN XÉT---------------------------------
 # ____________________CHỌN NGÔN NGỮ__________________________
 languages = ["Tiếng Việt", "English"]
 
@@ -580,7 +581,7 @@ languages = ["Tiếng Việt", "English"]
 default_language = "English"
 
 # Cho phép người dùng chọn ngôn ngữ
-language = st.selectbox("Chọn ngôn ngữ / Language settings", languages, index=languages.index(default_language))
+language = st.sidebar.selectbox("Chọn ngôn ngữ / Language settings", languages, index=languages.index(default_language))
 #----------------------CALL API-----------------------------------
 # Hàm lấy nhận xét dựa trên điểm số và trait
 # Đặt API key của OpenAI
@@ -687,7 +688,7 @@ def get_trait_description_with_gpt(trait, score, language, age):
     return generate_content_with_gpt(prompt)
 
 # Hàm để sinh mô tả top 3 traits dựa trên GPT và độ tuổi
-def get_top_traits_description_with_gpt(top_3_traits, language, age):
+def get_top_traits_description_with_gpt(top_3_traits, final_scores, language, age):
     # Đọc prompt từ file (giả sử bạn có một file riêng cho top 3 traits)
     prompt_template = load_prompt_from_file('top_3_traits_template.txt')
     
@@ -698,10 +699,18 @@ def get_top_traits_description_with_gpt(top_3_traits, language, age):
     # Điều chỉnh giọng văn và nhóm tuổi dựa trên độ tuổi
     tone, age_group = adjust_tone_based_on_age(age)
     # Gọi hàm xác định mức độ điểm số và mô tả
-    score_level, score_description = determine_score_level_and_description(trait, score)
+    # score_level, score_description = determine_score_level_and_description(trait, score)
+    
+    # Chuẩn bị nội dung top 3 traits để điền vào prompt
+    traits_info = []
+    # for trait in top_3_traits:  # Thêm vòng lặp cho top 3 traits
+    for trait in final_scores:  # Lặp qua tất cả các traits trong final_scores
+        score = final_scores[trait]  # Lấy điểm số của trait hiện tại từ final_scores
+        score_level, score_description = determine_score_level_and_description(trait, score)
+        traits_info.append(f"Trait: {trait}, Score: {score} ({score_level}) - {score_description}")
 
     # Tạo prompt bằng cách thay thế các biến
-    prompt = prompt_template.format(top_3_traits=', '.join(top_3_traits), language=language, tone=tone, age_group=age_group)
+    prompt = prompt_template.format(top_3_traits=', '.join(top_3_traits),traits_info='\n'.join(traits_info), language=language, tone=tone, age_group=age_group)
     
     # Gọi GPT để sinh nội dung
     return generate_content_with_gpt(prompt)
@@ -727,7 +736,6 @@ def get_highest_and_lowest_trait(final_scores):
     highest_trait = sorted_traits[0][0]  # Trait có điểm cao nhất
     lowest_trait = sorted_traits[-1][0]  # Trait có điểm thấp nhất
     return highest_trait, lowest_trait
-
 
 # -----------------HỆ THỐNG ĐIỂM PRODUCT-----------------------------------------------------------------------
 
@@ -1423,7 +1431,7 @@ if st.sidebar.button("✨Calculate✨"):
 
                     # Hiển thị mô tả cho top 3 traits
                     top_3_traits = get_top_3_traits(final_scores)
-                    top_traits_description = get_top_traits_description_with_gpt(top_3_traits, language, age)
+                    top_traits_description = get_top_traits_description_with_gpt(top_3_traits,final_scores, language, age)
                     # Lưu báo cáo vào cache với user_hash
                     st.session_state.report_cache[user_hash] = (financial_traits_text, top_traits_description)
 
