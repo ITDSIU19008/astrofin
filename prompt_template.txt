@@ -6,7 +6,7 @@ Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {
 
 Yêu cầu bổ sung:
 Liên kết giữa các trait: Mặc dù {trait} này được mô tả độc lập, hãy tạo sự liên kết tinh tế với các trait khác để đoạn văn có tính liền mạch, dù không có ngữ cảnh trước đó.
-Mỗi đoạn mở đầu khác nhau: Tránh lặp lại các từ khóa như "When it comes to...", "Khi.." hoặc các cấu trúc câu mở đầu giống nhau. Sử dụng cách mở đầu khác nhau cho mỗi trait.
+Mở đầu mỗi đoạn với cấu trúc: "Với {score} thuộc mức {score_level} trong {trait},"
 Tạo sự chuyển tiếp tự nhiên: Dùng từ nối hoặc cụm từ để tạo cảm giác như mỗi trait liên kết với nhau một cách mạch lạc.
 
 Lưu ý:
