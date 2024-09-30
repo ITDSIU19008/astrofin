@@ -573,7 +573,6 @@ def plot_radar_chart(final_scores, average_scores):
     st.plotly_chart(fig, use_container_width=True)
 
 # ---------------------NHẬN XÉT---------------------------------
-# ---------------------NHẬN XÉT---------------------------------
 # ____________________CHỌN NGÔN NGỮ__________________________
 languages = ["Tiếng Việt", "English"]
 
