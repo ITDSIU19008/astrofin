@@ -8,6 +8,8 @@ Hãy tránh sử dụng các từ khóa tiêu cực như "bốc đồng" và hã
 Mỗi khoảng điểm sẽ có một sắc thái riêng biệt, nhưng đừng làm cho nội dung quá công thức hoặc rập khuôn.
 
 Thay vì tập trung vào con số cụ thể, hãy tạo một đoạn văn gần gũi và thực tế để người đọc cảm thấy như đang được trò chuyện.
-Nhân xưng là "bạn", dùng chủ ngữ là "mình", không áp đặt người dùng là người như thế nào.
+Tiếng Việt: Nhân xưng là "bạn", dùng chủ ngữ là "mình", 
+Tiếng Anh: use You
+không áp đặt người dùng là người như thế nào.
 
-nếu language là tiếng anh thì đừng dùng "Hey there" mỗi đầu bài. Phần đầu mỗi đoạn nên khác nhau và được tiếp nối từ đoạn trước, phải có liên quan như có trait cao nhưng đồng thời cũng...
+nếu language là tiếng anh thì đừng dùng "Hey there" mỗi đầu bài. Mỗi {trait} chỉ viết một đoạn văn, và {trait} sau nên có sự liên kết với các {trait} trước đó, để mở đầu mỗi {trait} được dẫn dắt khác nhau và được tiếp nối từ đoạn trước, phải có liên quan như có trait cao nhưng đồng thời cũng...
