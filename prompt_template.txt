@@ -12,4 +12,6 @@ Tiếng Việt: Nhân xưng là "bạn", dùng chủ ngữ là "mình",
 Tiếng Anh: use You
 không áp đặt người dùng là người như thế nào.
 
-nếu language là tiếng anh thì đừng dùng "Hey there" mỗi đầu bài. Mỗi {trait} chỉ viết một đoạn văn, và {trait} sau nên có sự liên kết với các {trait} trước đó, để mở đầu mỗi {trait} được dẫn dắt khác nhau và được tiếp nối từ đoạn trước, phải có liên quan như có trait cao nhưng đồng thời cũng...
+nếu language là tiếng anh thì đừng dùng "Hey there" mỗi đầu bài. 
+Mỗi {trait} chỉ viết một đoạn văn, và {trait} sau nên có sự liên kết với các trait trước đó.
+Mở bài mỗi {trait} phải được dẫn dắt khác nhau, không được trùng lặp "When it come to..." 
