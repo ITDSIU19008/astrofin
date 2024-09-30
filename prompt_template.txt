@@ -4,32 +4,10 @@ Score: {score}
 Viết một đoạn nhận xét ngắn gọn về hành vi chi tiêu của người dùng dựa trên đặc điểm tính cách {trait} và điểm số {score} dựa trên mức điểm {score_level}. {score_description}
 Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {age_group}.Ngôn ngữ: {language}.
 
-Yêu cầu sự liên kết giữa các trait: Đoạn văn mới về trait tiếp theo cần được kết nối với trait trước đó, bằng cách tạo ra sự liên kết giữa các hành vi tài chính hoặc chi tiêu. Ví dụ: Nếu một khách hàng vừa cẩn trọng, nhưng cũng có phần bốc đồng, bạn có thể mô tả cách hai trait này ảnh hưởng lẫn nhau trong hành vi tài chính của họ.
-Liên kết giữa các trait: Mỗi trait mới nên có một câu dẫn dắt hoặc giới thiệu sự liên quan tới trait trước. Đừng để chúng bị tách biệt hoàn toàn. Mở đầu mỗi đoạn cần khác nhau, không lặp lại cấu trúc như "When it comes to..."
-
-Yêu cầu đặc biệt:
-Mỗi đoạn mở đầu phải khác nhau, tránh các cụm từ lặp lại như "When it comes to...".
-Cần liên kết trait mới với trait trước đó bằng cách mô tả cách hai đặc điểm này ảnh hưởng lẫn nhau trong hành vi tài chính.
-Dùng các từ nối linh hoạt và mở đầu bằng nhiều cách khác nhau để tạo ra sự phong phú trong câu văn.
-Một số cách mở đầu thay thế cho "When it comes to...":
-Adventurous:
-
-"Bạn thường không ngại thử nghiệm những điều mới lạ, đặc biệt trong chi tiêu và đầu tư..."
-Cautious (liên kết với Adventurous):
-
-"Mặc dù bạn khá thích mạo hiểm, đôi khi bạn cũng cho thấy sự cẩn trọng, đặc biệt khi gặp rủi ro lớn..."
-Impulsive:
-
-"Thỉnh thoảng, bạn có thể hành động một cách nhanh chóng và bốc đồng, dễ dàng bị thu hút bởi những ưu đãi hấp dẫn..."
-Analytical:
-
-"Ngoài ra, bạn còn có khả năng phân tích và cân nhắc kỹ lưỡng, không bỏ qua bất kỳ chi tiết nào trước khi đưa ra quyết định tài chính..."
-Convenience:
-
-"Bạn luôn đặt sự tiện lợi lên hàng đầu, ưu tiên các giải pháp giúp tiết kiệm thời gian và công sức..."
-Conservative:
-
-"Với sự thận trọng, bạn luôn cố gắng đảm bảo tài chính của mình được an toàn và ổn định..."
+Yêu cầu bổ sung:
+Liên kết giữa các trait: Mặc dù {trait} này được mô tả độc lập, hãy tạo sự liên kết tinh tế với các trait khác để đoạn văn có tính liền mạch, dù không có ngữ cảnh trước đó.
+Mỗi đoạn mở đầu khác nhau: Tránh lặp lại các từ khóa như "When it comes to..." hoặc các cấu trúc câu giống nhau. Sử dụng cách mở đầu khác nhau cho mỗi trait.
+Tạo sự chuyển tiếp tự nhiên: Dùng từ nối hoặc cụm từ để tạo cảm giác như mỗi trait liên kết với nhau một cách mạch lạc.
 
 Lưu ý:
 Mỗi {trait} chỉ viết 1 đoạn văn ngắn.
