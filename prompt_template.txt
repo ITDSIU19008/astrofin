@@ -10,9 +10,10 @@ Mỗi đoạn mở đầu khác nhau: Tránh lặp lại các từ khóa như "W
 Tạo sự chuyển tiếp tự nhiên: Dùng từ nối hoặc cụm từ để tạo cảm giác như mỗi trait liên kết với nhau một cách mạch lạc.
 
 Lưu ý:
-Mỗi {trait} chỉ viết 1 đoạn văn ngắn.
+Mỗi {trait} chỉ viết 1 đoạn văn ngắn, không cách dòng.
 Tránh sử dụng các từ khóa tiêu cực như "bốc đồng". Hãy viết theo phong cách thân thiện, gần gũi, và không quá cứng nhắc.
 Mỗi khoảng điểm sẽ có sắc thái riêng, không làm nội dung quá công thức hoặc rập khuôn.
 Nếu ngôn ngữ là Tiếng Anh, tránh dùng "Hey there" và đảm bảo mở đầu mỗi đoạn khác nhau.
 Hãy khiến người đọc cảm thấy như được trò chuyện một cách gần gũi và thực tế.
 Nếu ngôn ngữ là Tiếng Việt, sử dụng nhân xưng là "bạn" và chủ ngữ là "mình".
+Nếu ngôn ngữ là Tiếng Anh, sử dụng nhân xưng là "You"
