@@ -3,15 +3,20 @@ Score: {score}
 
 Viết một đoạn nhận xét ngắn gọn về hành vi chi tiêu của người dùng dựa trên đặc điểm tính cách {trait} và điểm số {score} dựa trên mức điểm {score_level}. {score_description}
 Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {age_group}.Ngôn ngữ: {language}.
+Yêu cầu sự liên kết giữa các trait: Đoạn văn mới về trait tiếp theo cần được kết nối với trait trước đó, bằng cách tạo ra sự liên kết giữa các hành vi tài chính hoặc chi tiêu. Ví dụ: Nếu một khách hàng vừa cẩn trọng, nhưng cũng có phần bốc đồng, bạn có thể mô tả cách hai trait này ảnh hưởng lẫn nhau trong hành vi tài chính của họ.
+Liên kết giữa các trait: Mỗi trait mới nên có một câu dẫn dắt hoặc giới thiệu sự liên quan tới trait trước. Đừng để chúng bị tách biệt hoàn toàn.
+Ví dụ về sự chuyển tiếp giữa các trait:
+Mở đầu trait đầu tiên:
+"Bạn có xu hướng thích khám phá và không ngại thử thách khi chi tiêu. Điều này thể hiện rõ trong cách bạn tiếp cận các khoản đầu tư mới lạ..."
+Mở đầu trait thứ hai có liên kết với trait đầu tiên:
+"Bên cạnh sự táo bạo của bạn, đôi khi bạn cũng cho thấy một chút thận trọng khi quyết định đầu tư, đặc biệt là khi đối mặt với các rủi ro tài chính tiềm ẩn..."
+Mở đầu trait tiếp theo:
+"Ngoài ra, bạn còn là người thích sự tiện lợi trong các giao dịch, thường ưu tiên những sản phẩm và dịch vụ giúp tiết kiệm thời gian mà vẫn đảm bảo sự an toàn trong chi tiêu."
 
-Hãy tránh sử dụng các từ khóa tiêu cực như "bốc đồng" và hãy viết theo phong cách thân thiện, gần gũi và không quá cứng nhắc.
-Mỗi khoảng điểm sẽ có một sắc thái riêng biệt, nhưng đừng làm cho nội dung quá công thức hoặc rập khuôn.
-
-Thay vì tập trung vào con số cụ thể, hãy tạo một đoạn văn gần gũi và thực tế để người đọc cảm thấy như đang được trò chuyện.
-Tiếng Việt: Nhân xưng là "bạn", dùng chủ ngữ là "mình", 
-Tiếng Anh: use You
-không áp đặt người dùng là người như thế nào.
-
-nếu language là tiếng anh thì đừng dùng "Hey there" mỗi đầu bài. 
-Mỗi {trait} chỉ viết một đoạn văn, và {trait} sau nên có sự liên kết với các trait trước đó.
-Mở bài mỗi {trait} phải được dẫn dắt khác nhau, không được trùng lặp "When it come to..." 
+Lưu ý:
+Tránh sử dụng các từ khóa tiêu cực như "bốc đồng". Hãy viết theo phong cách thân thiện, gần gũi, và không quá cứng nhắc.
+Mỗi khoảng điểm sẽ có sắc thái riêng, không làm nội dung quá công thức hoặc rập khuôn.
+Mở đầu mỗi đoạn cần khác nhau, không lặp lại cấu trúc như "When it comes to..."
+Nếu ngôn ngữ là Tiếng Anh, tránh dùng "Hey there" và đảm bảo mở đầu mỗi đoạn khác nhau.
+Hãy khiến người đọc cảm thấy như được trò chuyện một cách gần gũi và thực tế.
+Nếu ngôn ngữ là Tiếng Việt, sử dụng nhân xưng là "bạn" và chủ ngữ là "mình".
