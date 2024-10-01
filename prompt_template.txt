@@ -8,7 +8,7 @@ Viết một đoạn nhận xét ngắn gọn về hành vi chi tiêu của ngư
 Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {age_group}.Sử dụng ngôn ngữ:{language}.
 
 Yêu cầu bổ sung:
-Nếu Ngôn Ngữ là tiếng việt, cần sử dụng thuần việt toàn bộ 
+Nếu Ngôn Ngữ là {language}, cần sử dụng thuần {language} toàn bộ 
 traits = tính cách: Adventurous = Maọ Hiểm, Impulsive = Phóng Khoáng, Analytical = Tỉ Mỉ, Convenience = Linh Hoạt, Conservative = Kiên Định, và Cautious = Cẩn Trọng, 
 Mở đầu mỗi đoạn với cấu trúc: "Với {score} điểm, phần tính cách {trait} trong bạn được xếp hạng ở mức {score_level} ...,"
 
