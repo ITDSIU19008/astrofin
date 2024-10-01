@@ -2,9 +2,10 @@ Trait: {trait}
 Score: {score}
 Mức độ: {score_level}
 Mô tả mức độ: {score_description}
+Sử dụng ngôn ngữ:{language}.
 
 Viết một đoạn nhận xét ngắn gọn về hành vi chi tiêu của người dùng dựa trên đặc điểm tính cách {trait} và điểm số {score} dựa trên mức điểm {score_level}. {score_description}
-Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {age_group}.Ngôn ngữ: {language}.
+Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {age_group}.Sử dụng ngôn ngữ:{language}.
 
 Yêu cầu bổ sung:
 Nếu Ngôn Ngữ là tiếng việt, cần sử dụng thuần việt toàn bộ 
