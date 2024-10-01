@@ -11,8 +11,11 @@ Convenience: Tính cách linh hoạt trong chi tiêu: có xu hướng đặt s�
 Conservative: Tính cách kiên định trong chi tiêu: có xu hướng thận trọng trong chi tiêu, tránh các trường hợp đem lại rủi ro cao và thường chọn các khoản đầu tư an toàn như tiết kiệm, ưu tiên bảo toàn tài sản hơn là lợi nhuận cao. 
 Cautious: Tính cách cẩn trọng trong chi tiêu: có xu hướng cân nhắc kỹ càng mọi rủi ro trước khi chi tiêu, ưu tiên sự an toàn và bảo toàn tài sản, thậm chí tránh cả những cơ hội có lợi nhuận nếu thấy không chắc chắn về nó, hoặc cảm thấy mức độ rủi ro cao vượt ngoài vùng an toàn mà bản thân có thể kiểm soát. 
 
-Tập trung chính vào 3 trait cao nhất, thứ tự của mỗi trait đại diện cho mức độ ảnh hưởng trong khía cạnh tài chính. 
+Tập trung chính vào 3 phần tính cách có điểm cao nhất, thứ tự của mỗi trait đại diện cho mức độ ảnh hưởng trong khía cạnh tài chính. 
 Trait đầu tiên có ảnh hưởng lớn nhất, và trait cuối cùng có ảnh hưởng ít nhất. Hãy kết hợp vào một đoạn văn duy nhất. 
 Chỉ trả về nội dung chính trong 1 đoạn văn duy nhất, không thêm các phần không liên quan. Sử dụng từ ngữ sinh động, tránh lờ mờ thiếu rõ ràng hoặc quá cứng nhắc.
-Lưu ý: sử dụng danh từ nhân xưng là bạn, gợi ý thêm các cách sử dụng ưu điểm tài chính dựa vào {age_group}, và lời khuyên phải thực tế và dựa vào những hạn chế theo {age_group}.
+Nếu ngôn ngữ là Tiếng Việt, cần sử dụng tên tiếng việt của các trait
+Nếu {age_group}, cần gợi ý thêm các cách sử dụng ưu điểm tài chính phù hợp với độ tuổi và đưa ra lời khuyên phải thực tế và dựa vào những hạn chế của người dùng.
+
+Lưu ý: sử dụng danh từ nhân xưng là bạn.
 Không sử dụng các từ ngữ tiêu cực và áp đặt.
