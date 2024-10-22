@@ -1853,11 +1853,38 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         st.write("### Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
                         with st.expander("**Đề xuất sản phẩm PHÙ HỢP**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
                             st.write(eligible_content)
+
+                        if language == "Tiếng Việt":
+                            st.subheader("Bạn sẽ thích: ")
+                            eligible_df['Score'] = eligible_df['Score'].round(2)
+                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            eligible_df_display = eligible_df.drop(columns=['Score'])
+                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        else:
+                            st.subheader("Your matches:")
+                            eligible_df['Score'] = eligible_df['Score'].round(2)  
+                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            eligible_df_display = eligible_df.drop(columns=['Score'])
+                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        
                         st.write("                         ")
                         st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Product Recommendations:")
                         with st.expander("**Đề xuất sản phẩm CẦN THIẾT**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
                             st.write(necessary_content)
-            
+                            
+                        if language == "Tiếng Việt":
+                            st.subheader("Bạn sẽ cần: ")
+                            necessary_df['Score'] = necessary_df['Score'].round(2) 
+                            # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            necessary_df_display = necessary_df.drop(columns=['Score'])
+                            st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        else:
+                            st.subheader("You will need: ")
+                            necessary_df['Score'] = necessary_df['Score'].round(2)  
+                            # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            necessary_df_display = necessary_df.drop(columns=['Score'])
+                            st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                
                     else:
                         # Tạo đoạn văn bản mô tả tất cả các traits với số thứ tự
                         financial_traits_text = ""
