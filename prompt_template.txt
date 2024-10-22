@@ -9,8 +9,8 @@ Hãy đảm bảo rằng giọng văn {tone} và phù hợp với nhóm tuổi {
 
 Yêu cầu bổ sung:
 Nếu Ngôn Ngữ là {language}, cần sử dụng thuần {language} toàn bộ 
-traits = tính cách: Adventurous = Maọ Hiểm, Impulsive = Phóng Khoáng, Analytical = Tỉ Mỉ, Convenience = Linh Hoạt, Conservative = Kiên Định, và Cautious = Cẩn Trọng, 
-Mở đầu mỗi đoạn với cấu trúc: "Với {score} điểm, phần tính cách {trait} trong bạn được xếp hạng ở mức {score_level} ...,"
+traits = tính cách: Adventurous = Maọ Hiểm, Impulsive = Phóng Khoáng, Analytical = Tỉ Mỉ, Convenient = Ưa Tiện Lợi, Conservative = Kiên Định, và Cautious = Cẩn Trọng, 
+Mở đầu mỗi đoạn với cấu trúc: "Với {score}(làm tròn {score} .2f) điểm, phần tính cách {trait} trong bạn được xếp hạng ở mức {score_level} ...,"
 
 Lưu ý:
 Mỗi {trait} chỉ viết 1 đoạn văn ngắn, không cách dòng.

@@ -1,0 +1,15 @@
+Product,Conservative,Analytical,Cautious,Adventurous,Impulsive,Convenient,,level,weight_range
+TermDeposit,0.95,0.85,0.9,0.3,0.35,0.3,,Very Low,0.05 - 0.23
+Money_Pot,0.9,0.8,0.9,0.3,0.1,0.9,,Low,0.24 - 0.41
+Shared_Pot,0.85,0.9,0.9,0.7,0.4,0.9,,Medium,0.42 - 0.59
+Goal_Saves,0.8,0.7,0.75,0.1,0.3,0.85,,High,0.60 - 0.77
+SchedulePayment,0.6,0.6,0.9,0.2,0.1,0.95,,Very High,0.78 - 0.95
+SettingBudget,0.9,0.9,0.9,0.3,0.5,0.75,,,
+Tags,0.9,0.9,0.9,0.5,0.1,0.6,,,
+CashLoans,0.4,0.6,0.5,0.6,0.8,0.9,,,
+Credit_Card,0.3,0.7,0.55,0.75,0.85,0.85,,,
+Investment,0.3,0.7,0.7,0.9,0.5,0.5,,,
+Overdraft,0,0,0,0,0,0,,,
+Insurance,0.85,0.6,0.9,0.2,0.2,0.5,,,
+Split_bill,0.5,0.7,0.7,0.75,0.85,0.9,,,
+Gift,0.4,0.55,0.35,0.75,0.9,0.9,,,

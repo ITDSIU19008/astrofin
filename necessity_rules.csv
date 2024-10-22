@@ -4,6 +4,6 @@ Credit_Card,scores['Impulsive'] > 3.45 and scores['Adventurous'] > 3.0 and score
 Insurance,scores['Impulsive'] > 3.5 or scores['Cautious'] < 3.0
 TermDeposit,scores['Adventurous'] < 4.0 or scores['Impulsive'] > 3.0
 Money_Pot,scores['Impulsive'] > 3.45 and scores['Cautious'] < 3.0
-SchedulePayment,scores['Convenience'] > 4.0 and scores['Cautious'] < 3.0
+SchedulePayment,scores['Convenient'] > 4.0 and scores['Cautious'] < 3.0
 Tags,scores['Cautious'] > 3.5 and scores['Analytical'] > 3.0
-Split_bill,scores['Convenience'] > 3.5
+Split_bill,scores['Convenient'] > 3.5
