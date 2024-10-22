@@ -1,0 +1,7 @@
+[theme]
+base="dark"  # Thay đổi theme sang dark
+primaryColor="#C600FD"
+backgroundColor="#0E1117"
+secondaryBackgroundColor="#262730"
+textColor="#FAFAFA"
+font = "serif"
