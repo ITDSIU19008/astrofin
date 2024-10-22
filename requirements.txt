@@ -13,3 +13,4 @@ plotly
 openai
 swisseph
 pyswisseph
+unicode
