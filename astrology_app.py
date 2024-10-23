@@ -781,13 +781,19 @@ def load_user_hash():
     except FileNotFoundError:
         return []
 
-def append_report_cache_to_txt(user_hash, financial_traits_text, top_traits_description,  eligible_content,necessary_content):
+def append_report_cache_to_txt(user_hash, financial_traits_text, top_traits_description, eligible_content, necessary_content):
     with open('txt3.txt', 'a') as file:  # Chế độ 'a' để thêm vào file thay vì ghi đè
         financial_traits_text = financial_traits_text.replace('\n', '\\n')
         top_traits_description = top_traits_description.replace('\n', '\\n')
-        # product_content = product_content.replace('\n', '\\n')  # Chuyển đổi để lưu đúng format
         eligible_content = eligible_content.replace('\n', '\\n')
-        necessary_content = necessary_content.replace('\n', '\\n')
+
+        # Kiểm tra nếu necessary_content không phải None
+        if necessary_content is not None:
+            necessary_content = necessary_content.replace('\n', '\\n')
+        else:
+            necessary_content = ""  # Nếu None, lưu chuỗi rỗng
+
+        # Ghi dữ liệu vào file
         file.write(f"{user_hash}|{financial_traits_text}|{top_traits_description}|{eligible_content}|{necessary_content}\n")
 
 # Hàm khôi phục report_cache từ file txt (bao gồm sản phẩm)
@@ -802,16 +808,22 @@ def load_report_cache_from_txt():
                     financial_traits_text = parts[1].replace('\\n', '\n')
                     top_traits_description = parts[2].replace('\\n', '\n')
                     eligible_content = parts[3].replace('\\n', '\n')
-                    necessary_content = parts[4].replace('\\n', '\n')
+                    necessary_content = parts[4].replace('\\n', '\n') if parts[4] else None
 
                     # Lưu tất cả 4 giá trị vào cache
-                    report_cache[user_hash] = (financial_traits_text, top_traits_description, eligible_content, necessary_content)
+                    report_cache[user_hash] = (
+                        financial_traits_text, 
+                        top_traits_description, 
+                        eligible_content, 
+                        necessary_content
+                    )
                 else:
                     print(f"Dòng không hợp lệ: {line.strip()}")
         return report_cache
     except FileNotFoundError:
         print("File không tồn tại, khởi tạo dữ liệu mới")
         return {}
+
 
 # Create a hash based on user information (birth date, time, and place)
 def generate_user_hash(birth_date, birth_time, birth_place, language):
@@ -969,18 +981,36 @@ def prepare_eligible_info(eligible_df, language):
     return eligible_info
 
 
-def prepare_necessary_info(necessary_df):
+# Lấy top 5 sản phẩm từ bảng eligible
+def get_top_5_eligible_products(eligible_df):
+    top_5_eligible_df = eligible_df.nlargest(5, 'Score')
+    return top_5_eligible_df['Product'].tolist()
+
+# Chuẩn bị nội dung bảng cần thiết sau khi loại bỏ các sản phẩm trùng
+def prepare_necessary_info(necessary_df, eligible_df):
+    # Kiểm tra nếu đầu vào là list và chuyển thành DataFrame
     if isinstance(necessary_df, list):
         necessary_df = pd.DataFrame(necessary_df, columns=['Product', 'Score', 'Label'])
 
+    # Lấy danh sách top 5 sản phẩm từ bảng eligible
+    top_5_products = get_top_5_eligible_products(eligible_df)
+
+    # Lọc bỏ các sản phẩm đã xuất hiện trong top 5 của bảng eligible
+    filtered_necessary_df = necessary_df[~necessary_df['Product'].isin(top_5_products)]
+
+    # Nếu không còn sản phẩm cần thiết, trả về None
+    if filtered_necessary_df.empty:
+        return None
+
+    # Chuẩn bị thông tin sản phẩm cần thiết sau khi lọc
     necessary_info = "\n".join([
-        # f"- {row['Product']} (Score: {row['Score']}): {row['Label']} "
-        f"- {row['Product']}: {row['Label']}"
+        f"- {row['Product']}: {row['Label']} "
         f"_Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/{row['Product']})_"
-        for _, row in necessary_df.iterrows()
+        for _, row in filtered_necessary_df.iterrows()
     ])
 
     return necessary_info
+
 
 
 def generate_recommendation_for_eligible(eligible_df, final_scores, language, age):
@@ -1009,20 +1039,24 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
 
     return generate_content_with_gpt(prompt)
 
-def generate_recommendation_for_necessary(necessary_df, final_scores, language, age):
-    prompt_template = load_prompt_from_file('necessary_product_prompt_template.txt')
+# Tạo nội dung cho sản phẩm cần thiết nếu có
+def generate_recommendation_for_necessary(necessary_df, eligible_df, final_scores, language, age):
+    # Chuẩn bị thông tin cần thiết sau khi lọc
+    necessary_info = prepare_necessary_info(necessary_df, eligible_df)
 
-    necessary_info = prepare_necessary_info(necessary_df)
+    # Kiểm tra nếu không còn sản phẩm cần thiết
+    if necessary_info is None:
+        return None  # Không cần gọi API GPT
+
+    prompt_template = load_prompt_from_file('necessary_product_prompt_template.txt')
     tone, age_group = adjust_tone_based_on_age(age)
 
     # Chuẩn bị nội dung top 3 traits để điền vào prompt
-    traits_info = []
-    # for trait in top_3_traits:  # Thêm vòng lặp cho top 3 traits
-    for trait in final_scores:  # Lặp qua tất cả các traits trong final_scores
-        score = final_scores[trait]  # Lấy điểm số của trait hiện tại từ final_scores
-        score_level, score_description = determine_score_level_and_description(trait, score)
-        traits_info.append(f"Trait: {trait}, Score: {score} ({score_level}) - {score_description}")
-    
+    traits_info = [
+        f"Trait: {trait}, Score: {final_scores[trait]:.2f}"
+        for trait in sorted(final_scores, key=final_scores.get, reverse=True)[:3]
+    ]
+
     prompt = prompt_template.format(
         traits_info='\n'.join(traits_info),
         necessary_products=necessary_info,
@@ -1854,37 +1888,38 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         with st.expander("**Đề xuất sản phẩm PHÙ HỢP**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
                             st.write(eligible_content)
 
-                        if language == "Tiếng Việt":
-                            st.subheader("Bạn sẽ thích: ")
-                            eligible_df['Score'] = eligible_df['Score'].round(2)
-                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            eligible_df_display = eligible_df.drop(columns=['Score'])
-                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                        else:
-                            st.subheader("Your matches:")
-                            eligible_df['Score'] = eligible_df['Score'].round(2)  
-                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            eligible_df_display = eligible_df.drop(columns=['Score'])
-                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        # if language == "Tiếng Việt":
+                        #     st.subheader("Bạn sẽ thích: ")
+                        #     eligible_df['Score'] = eligible_df['Score'].round(2)
+                        #     # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        #     eligible_df_display = eligible_df.drop(columns=['Score'])
+                        #     st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        # else:
+                        #     st.subheader("Your matches:")
+                        #     eligible_df['Score'] = eligible_df['Score'].round(2)  
+                        #     # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        #     eligible_df_display = eligible_df.drop(columns=['Score'])
+                        #     st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
                         
                         st.write("                         ")
-                        st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Product Recommendations:")
-                        with st.expander("**Đề xuất sản phẩm CẦN THIẾT**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
-                            st.write(necessary_content)
-                            
-                        if language == "Tiếng Việt":
-                            st.subheader("Bạn sẽ cần: ")
-                            necessary_df['Score'] = necessary_df['Score'].round(2) 
-                            # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            necessary_df_display = necessary_df.drop(columns=['Score'])
-                            st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                        else:
-                            st.subheader("You will need: ")
-                            necessary_df['Score'] = necessary_df['Score'].round(2)  
-                            # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            necessary_df_display = necessary_df.drop(columns=['Score'])
-                            st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                
+                        if necessary_content:
+                            st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Product Recommendations:")
+                            with st.expander("**Đề xuất sản phẩm CẦN THIẾT**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
+                                st.write(necessary_content)
+
+                            # if language == "Tiếng Việt":
+                            #     st.subheader("Bạn sẽ cần: ")
+                            #     necessary_df['Score'] = necessary_df['Score'].round(2) 
+                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
+                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            # else:
+                            #     st.subheader("You will need: ")
+                            #     necessary_df['Score'] = necessary_df['Score'].round(2)  
+                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
+                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                    
                     else:
                         # Tạo đoạn văn bản mô tả tất cả các traits với số thứ tự
                         financial_traits_text = ""
@@ -1932,7 +1967,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
                             # product_content = get_product_recommendation_with_gpt(eligible_products, necessary_products, final_scores, language, age)
                             eligible_content = generate_recommendation_for_eligible(eligible_df, final_scores, language, age)
-                            necessary_content = generate_recommendation_for_necessary(necessary_df, final_scores, language, age)
+                            necessary_content = generate_recommendation_for_necessary(necessary_df, eligible_df, final_scores, language, age)
 
                             # Lưu báo cáo vào cache với user_hash
                             st.session_state.report_cache[current_user_hash] = (financial_traits_text, top_traits_description, eligible_content,necessary_content)
@@ -1953,38 +1988,40 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         with st.expander("**Đề xuất sản phẩm PHÙ HỢP**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
                             st.write(eligible_content)
                         
-                        if language == "Tiếng Việt":
-                            st.subheader("Bạn sẽ thích: ")
-                            eligible_df['Score'] = eligible_df['Score'].round(2)
-                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            eligible_df_display = eligible_df.drop(columns=['Score'])
-                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                        else:
-                            st.subheader("Your matches:")
-                            eligible_df['Score'] = eligible_df['Score'].round(2)  
-                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            eligible_df_display = eligible_df.drop(columns=['Score'])
-                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        # if language == "Tiếng Việt":
+                        #     st.subheader("Bạn sẽ thích: ")
+                        #     eligible_df['Score'] = eligible_df['Score'].round(2)
+                        #     # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        #     eligible_df_display = eligible_df.drop(columns=['Score'])
+                        #     st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        # else:
+                        #     st.subheader("Your matches:")
+                        #     eligible_df['Score'] = eligible_df['Score'].round(2)  
+                        #     # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        #     eligible_df_display = eligible_df.drop(columns=['Score'])
+                        #     st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
                         
                         st.write("                         ")
 
-                        st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Product Recommendations:")
-                        with st.expander("**Đề xuất sản phẩm CẦN THIẾT**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
-                            st.write(necessary_content)
+                         # Chỉ hiển thị nếu có sản phẩm cần thiết
+                        if necessary_content:
+                            st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Necessary Product Recommendations:")
+                            with st.expander("**Đề xuất sản phẩm CẦN THIẾT**" if language == "Tiếng Việt" else "**Necessary Products**", expanded=True):
+                                st.write(necessary_content)
                         
-                        if language == "Tiếng Việt":
-                            st.subheader("Bạn sẽ cần: ")
-                            necessary_df['Score'] = necessary_df['Score'].round(2) 
-                            # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            necessary_df_display = necessary_df.drop(columns=['Score'])
-                            st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                        else:
-                            st.subheader("You will need: ")
-                            necessary_df['Score'] = necessary_df['Score'].round(2)  
-                            # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            necessary_df_display = necessary_df.drop(columns=['Score'])
-                            st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                
+                            # if language == "Tiếng Việt":
+                            #     st.subheader("Bạn sẽ cần: ")
+                            #     necessary_df['Score'] = necessary_df['Score'].round(2) 
+                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
+                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            # else:
+                            #     st.subheader("You will need: ")
+                            #     necessary_df['Score'] = necessary_df['Score'].round(2)  
+                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
+                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                    
                         # Nếu không có trong cache, tạo nội dung sản phẩm mới với GPT
                             eligible_products = eligible_df[['Product', 'Label']].values.tolist()
                             necessary_products = necessary_df[['Product', 'Score', 'Label']].values.tolist()
