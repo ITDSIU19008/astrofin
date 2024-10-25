@@ -2595,10 +2595,16 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-# CSS và HTML cho Footer
-footer = """
+# Nội dung footer theo ngôn ngữ
+if language == "Tiếng Việt":
+    footer_content = """🌟 Được phát triển bởi đội ngũ Timo | <a style='color: #FFD700;' href="https://timo.vn" target="_blank">Timo.vn</a> 🌟"""
+else:
+    footer_content = """🌟 Developed by the Timo team | <a style='color: #FFD700;' href="https://timo.vn" target="_blank">Timo.vn</a> 🌟"""
+
+# CSS và HTML cho footer
+footer = f"""
     <style>
-    .footer {
+    .footer {{
         position: fixed;
         left: 0;
         bottom: 0;
@@ -2609,15 +2615,15 @@ footer = """
         padding: 10px;
         font-size: 16px;
         z-index: 100;
-    }
+    }}
     </style>
     <div class="footer">
-        <p>🌟 Được phát triển bởi đội ngũ Timo | <a style='color: #FFD700;' href="https://timo.vn" target="_blank">Timo.vn</a> 🌟</p>
+        <p>{footer_content}</p>
     </div>
 """
+
 # Hiển thị footer trên Streamlit
 st.markdown(footer, unsafe_allow_html=True)
-
 
 # # Hàm xóa cache từ session state và file txt
 # def delete_cache_by_user_hash():
@@ -2664,8 +2670,103 @@ st.markdown(footer, unsafe_allow_html=True)
 # # *** Thêm phần Admin Access và Cache Management ***
 # ADMIN_PASSWORD = "admin123"  
 
-# st.sidebar.subheader("   ABOUT US   ")
+import streamlit as st
 
+# Nội dung Tiếng Việt
+about_us_vn = """
+🔮 **Astrotomi** 🔮 - Mở đầu cho một sự kết hợp hoàn toàn mới & độc đáo giữa việc đọc bản đồ sao & phân tích thói quen tài chính, được phát triển bởi đội ngũ Timo (và một chút phép màu từ AI nữa).
+
+Chỉ cần nhập vài thông tin cơ bản, Astrotomi sẽ dự đoán xu hướng tài chính của bạn, từ đó đưa ra các gợi ý sản phẩm phù hợp nhất theo nhu cầu có trên ứng dụng Timo.
+
+Đã đủ hấp dẫn để bạn thử chưa? Bắt đầu thôi ✨
+
+**Lưu ý:** Kết quả Astrotomi chỉ mang tính tham khảo.
+"""
+
+# Nội dung Tiếng Anh
+about_us_en = """
+🔮 **Astrotomi** 🔮 – The start of a completely new and unique combination of star chart reading & financial habit analysis, developed by the Timo team (with a little magic from AI).
+
+Just enter a few basic details, and Astrotomi will predict your financial tendencies, then suggest the most suitable products based on your needs within the Timo app.
+
+Intrigued enough to give it a try? Let’s get started! ✨
+
+**Note:** Astrotomi results are for reference only.
+"""
+
+# Hàm mã hóa ảnh thành base64
+def encode_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+# Mã hóa ảnh QR và Tomi
+encoded_qr = encode_image("images/qr.png")
+encoded_tomi = encode_image("images/Tomi.png")
+
+# CSS cho căn giữa và tạo animation cho Tomi
+st.markdown(
+    """
+    <style>
+    .about-us {
+        text-align: justify;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .about-title {
+        font-weight: bold;
+        font-size: 24px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .about-content {
+        width: 80%;  /* Điều chỉnh độ rộng */
+        text-align: justify;
+        line-height: 1.6;
+    }
+    .sidebar-images {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .tomi-img {
+        animation: floating 3s infinite ease-in-out;
+    }
+    @keyframes floating {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Nội dung "About Us" tùy theo ngôn ngữ
+if language == "Tiếng Việt":
+    title = "VỀ DỰ ÁN"
+    content = about_us_vn
+else:
+    title = "ABOUT US"
+    content = about_us_en
+
+# Hiển thị tiêu đề, nội dung, và ảnh Tomi + QR code
+st.sidebar.markdown(
+    f"""
+    <div class="about-us">
+        <div class="about-title">{title}</div>
+        <div class="about-content">{content}</div>
+        <div class="sidebar-images">
+            <img class="tomi-img" src="data:image/png;base64,{encoded_tomi}" width="120"/>
+            <img src="data:image/png;base64,{encoded_qr}" width="120"/>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
 # # Hàm kiểm tra đăng nhập admin
