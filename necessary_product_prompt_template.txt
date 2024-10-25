@@ -23,7 +23,7 @@ Nếu ngôn ngữ là {language}, **chỉ sử dụng tên {language} của các
 Nên thêm vào các thông tin của tính cách, mức độ để bài viết có xu hướng phân tích hơn
 
 **Yêu cầu:**
-1. **Mở đầu:** chọn {language} phù hợp:
+1. **Mở đầu:** chọn {language} phù hợp (không để "Tiếng Việt:" ở đầu câu:
 Ngoài những sản phẩm phù hợp với bạn ở trên, dưới đây là một số sản phẩm mà bạn có thể cần để đảm bảo an toàn tài chính của mình, hãy cùng xem qua nhé:
 Beyond the products that suit you, here are some additional ones you may need to secure your financial well-being. Let’s take a look!
 
