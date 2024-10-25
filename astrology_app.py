@@ -1101,7 +1101,7 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
     top_20_eligible = eligible_df.nlargest(10, 'Score')
 
     # Kiểm tra nếu sản phẩm mẹ nằm trong top 20
-    parents_in_top_20 = set(top_20_eligible['Product']).intersection(product_hierarchy.keys())
+    parent_in_top_20 = set(top_20_eligible['Product']).intersection(product_hierarchy.keys())
 
     # Nếu sản phẩm mẹ nằm trong top 20, xử lý sản phẩm con
     if parent_in_top_20:
