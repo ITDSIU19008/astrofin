@@ -2282,7 +2282,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         st.write("### Hmmm ... Vậy **tính cách** tài chính của tôi là gì nhỉ?" if language == "Tiếng Việt" else "### Hmmm ... So, what’s my financial tendencies?")
 
                         # Sử dụng expander để ẩn/hiện phần nhận xét chi tiết
-                        with st.expander("**Nhận xét chi tiết**" if language == "Tiếng Việt" else "**Detailed financial behavior insights:**", expanded=True):
+                        with st.expander("**Từ những thông tin trên, Tomi có thể thấy...**" if language == "Tiếng Việt" else "###### **From the above information, Tomi can tell that...**", expanded=True):                            # st.write(top_traits_description)
                             # st.write(top_traits_description)
                             st.markdown(
                                 f"""
