@@ -161,6 +161,13 @@ location_cache = read_location_cache()
 
 # Hàm lấy city_suggestions từ cache hoặc API
 def get_city_suggestions(query):
+    if not query or not query.strip():
+        # Kiểm tra ngôn ngữ người dùng
+        if language == "Tiếng Việt":
+            return ["Vui lòng nhập vào nơi sinh của bạn"]
+        else:
+            return ["Please input your birthplace"]
+    
     normalized_place = normalize_place(query)
 
     # Kiểm tra xem place đã có trong cache chưa
@@ -628,12 +635,16 @@ def plot_radar_chart(final_scores, average_scores, language):
         f"{score_label}: <b>{score:.2f}</b><br>{level_label}: <b>{get_score_level(score, language)}</b>" 
         for score in scores
     ]
+    # Thiết lập tên dựa trên lựa chọn ngôn ngữ
+    your_trait_name = "Điểm của Bạn" if language == "Tiếng Việt" else "Your Trait"
+    average_scores_name = "Điểm Trung Bình" if language == "Tiếng Việt" else "Average Scores"
+
     # Thêm đường của Average Scores với thông tin hover
     fig.add_trace(go.Scatterpolar(
         r=avg_scores,
         theta=traits,
         fill='toself',
-        name='Average Scores',
+        name=average_scores_name,
         line=dict(color='rgba(0, 0, 255, 0.35)', dash='dashdot'),  # A lighter blue to simulate transparency
         fillcolor='rgba(204, 204, 255, 0.35)',
         hoverinfo='text',
@@ -646,7 +657,7 @@ def plot_radar_chart(final_scores, average_scores, language):
     r=scores,
     theta=traits,
     fill='toself',
-    name='<span style="color:black;">Your Trait</span>',
+    name=f'<span style="color:white;">{your_trait_name}</span>',
     line=dict(color='orange'),
     fillcolor='rgba(255, 165, 0, 0.25)',
     hoverinfo='text',
@@ -697,7 +708,7 @@ def plot_radar_chart(final_scores, average_scores, language):
     )
 
 # Thêm màu sắc và kích thước cho các traits
-    colors = [ 'blue', 'purple','red', 'orange','green', '#f1d800']
+    colors = [ '#2774ae', '#9D03C7','#d94b24', '#ff9425','#f1d800','green'] # xanh - tim - đỏ - cam - lá - vàng
     if len(traits) > len(colors):
         # Extend the colors list by repeating it as needed
         colors = colors * (len(traits) // len(colors) + 1)
@@ -705,7 +716,7 @@ def plot_radar_chart(final_scores, average_scores, language):
         polar=dict(
             angularaxis=dict(
                 tickvals=[0, 1, 2, 3, 4, 5],
-                ticktext=[f'<b style="color:{colors[i]};font-size:16px;">{traits[i]}</b>' for i in range(len(traits))],
+                ticktext=[f'<b style="color:{colors[i]}; font-family:Source Sans Pro, sans-serif; font-size:17px;">{traits[i]}</b>' for i in range(len(traits))],
                 tickmode='array',
             )
         ),
@@ -741,7 +752,7 @@ language = st.sidebar.selectbox("Chọn ngôn ngữ / Language settings", langua
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Hàm gọi GPT để sinh nội dung dựa trên input
-def generate_content_with_gpt(prompt, model="gpt-4o-mini", max_tokens=6000):
+def generate_content_with_gpt(prompt, model="gpt-4o-mini", max_tokens=9000):
     try:
         # neu version new 
         response = openai.chat.completions.create(
@@ -949,36 +960,203 @@ def get_highest_and_lowest_trait(final_scores):
     return highest_trait, lowest_trait
 
 # -----------------CALL API ĐỂ RA ĐOẠN VĂN MÔ TẢ ĐIỂM PRODUCT-----------------------------------------------------------------------
+# Dictionary for product names in both languages
+product_translation = {
+    "goal-save": {"vi": "Mục Tiêu Cá Nhân", "en": "Goal Save"},
+    "money-pot": {"vi": "Hũ Chi Tiêu", "en": "Money Pot"},
+    "shared-pot":  {"vi": "Hũ Chi Tiêu Chung", "en": "Shared Pot"},
+    
+    "pfm": {"vi": "Quản Lý Tài Chính Cá Nhân", "en": "Personal Financial Management"},
+    "spending-prediction": {"vi": "Dự Đoán Thu Chi", "en": "Spending Prediction"},
+    "category-report": {"vi": "Báo Cáo Thu Chi", "en": "Cashflow Report"},
+    "cashflow-overview": {"vi": "Báo Cáo Thu Chi Tổng Hợp", "en": "Cashflow Overview"},
+    "asset-tracker": {"vi": "Báo Cáo Tổng Tài Sản", "en": "Asset Tracker"},
+    "tags":  {"vi": "Gắn Nhãn Giao Dịch", "en": "Transaction Tags"},
+    "setting-budget": {"vi": "Giới Hạn Chi Tiêu", "en": "Setting Budgets"},
 
-# Hàm để chuẩn bị thông tin sản phẩm từ DataFrame cho GPT
-def prepare_eligible_info(eligible_df, language):
-    # Kiểm tra nếu đầu vào là list và chuyển thành DataFrame nếu cần
-    if isinstance(eligible_df, list):
-        eligible_df = pd.DataFrame(eligible_df, columns=['Product', 'Score', 'Label'])
+    "split-bill": {"vi": "Chia Tiền Nhóm", "en": "Split Bill"},
+    "schedule-payment": {"vi": "Chuyển Tiền Theo Lịch", "en": "Scheduled Payment"},
+    
+    "term-deposit": {"vi": "Tiết Kiệm Trực Tuyến", "en": "Term Deposit"},
+    
+    "overdraft": {"vi": "Thấu Chi", "en": "Overdraft"},
+    "installment-loan": {"vi": "Vay Trả Góp", "en": "Installment Loan"},
+    "visa-credit-card": {"vi": "Thẻ Tín Dụng VISA", "en": "VISA Credit Card"},
+    
+    "vinacapital-investments": {"vi": "Quỹ VCAM/VinaCapital", "en": "VCAM/VinaCapital Investments"},
+    # "vcam-investment": {"vi": "Quỹ VCAM", "en": "VCAM Investment"},
+    
+    "present": {"vi": "Lì Xì", "en": "Lixi"},
+    
+    "liberty-travel-insurance": {"vi": "Bảo Hiểm Du Lịch", "en": "Travel Insurance"},
+}
 
-    # Xác định các nhãn phù hợp dựa trên ngôn ngữ
+# Hàm lấy tên sản phẩm theo ngôn ngữ đã chọn
+def get_product_name(product_key, language):
+    product = product_translation.get(product_key, {})
     if language == "Tiếng Việt":
-        valid_labels = ['Rất phù hợp', 'Phù hợp']
-    else:  # Nếu ngôn ngữ là tiếng Anh
-        valid_labels = ['Very Suitable', 'Suitable']
+        return f"{product.get('vi')} ({product.get('en')})"
+    else:
+        return f"{product.get('en')} ({product.get('vi')})"
+    
 
-    # Lọc các sản phẩm theo nhãn phù hợp
-    filtered_df = eligible_df[eligible_df['Label'].isin(valid_labels)]
+# Dictionary phân cấp sản phẩm
+product_hierarchy = {
+    "pfm": [
+        "tags",
+        "setting-budget",
+        "category-report",
+        "cashflow-overview",
+        "asset-tracker",
+        "spending-prediction",
+    ]
+}
+# def get_child_products(product_key, language):
+#     if product_key in product_hierarchy:
+#         child_products = product_hierarchy[product_key]
+#         return "\n".join([
+#             f"- {get_product_name(child, language)} _[Link](https://timo.vn/products/{child})_"
+#             for child in child_products
+#         ])
+#     return ""
+# def prepare_eligible_info(eligible_df, language):
+    # Tạo từ điển các sản phẩm chính và sản phẩm con
+    # product_hierarchy = {
+    #     "pfm": [
+    #         "speding-prediction",
+    #         "category-report",
+    #         "cashflow-overview",
+    #         "asset-tracker",
+    #         "tags",
+    #         "setting-budget"
+    #     ]
+    # }
 
-    # Sắp xếp theo điểm số giảm dần và lấy tối đa 5 sản phẩm
-    top_5_eligible = filtered_df.nlargest(5, 'Score')
+    # # Kiểm tra nếu đầu vào là list và chuyển thành DataFrame nếu cần
+    # if isinstance(eligible_df, list):
+    #     eligible_df = pd.DataFrame(eligible_df, columns=['Product', 'Score', 'Label'])
 
-    # Chuẩn bị thông tin sản phẩm với link cho từng sản phẩm
-    eligible_info = "\n".join([
-        f"- {row['Product']}: {row['Label']} "
-        f"_Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/{row['Product']})_"
-        if language == "Tiếng Việt" 
-        else f"- {row['Product']}: {row['Label']} "
-             f"_Learn more at [Link](https://timo.vn/products/{row['Product']})_"
-        for _, row in top_5_eligible.iterrows()
-    ])
+    # # Lọc và lấy top 5 sản phẩm theo điểm số
+    # filtered_df = eligible_df.nlargest(5, 'Score')
+
+    # # Chuẩn bị thông tin hiển thị
+    # eligible_info = ""
+
+    # # Lặp qua từng sản phẩm trong top 5
+    # for _, row in filtered_df.iterrows():
+    #     product = row['Product']
+    #     product_name = get_product_name(product, language)
+    #     label = row['Label']
+    #     link = f"https://timo.vn/products/{product}"
+
+    #     # Kiểm tra nếu sản phẩm có sản phẩm con trong hierarchy
+    #     if product in product_hierarchy:
+    #         eligible_info += f"{product_name} - {label}\n"
+    #         eligible_info += f"- {product_name}\n  _Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
+    #         eligible_info += f"Sản Phẩm này bao gồm:\n"
+
+    #         # Thêm các sản phẩm con
+    #         for sub_product in product_hierarchy[product]:
+    #             sub_product_name = get_product_name(sub_product, language)
+    #             # sub_link = f"https://timo.vn/products/{sub_product}"
+    #             eligible_info += f"- {sub_product_name}: {label}\n"
+
+    #     else:
+    #         # Nếu không có sản phẩm con, chỉ hiển thị sản phẩm chính
+    #         eligible_info += f"- {product_name} - {label}\n"
+    #         eligible_info += f"  _Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
+
+    #     eligible_info += "\n"  # Thêm khoảng trắng giữa các sản phẩm
+
+    # return eligible_info
+
+# #  Kiểm tra nếu đầu vào là list và chuyển thành DataFrame nếu cần
+#     child_products = set(
+#         product for products in product_hierarchy.values() for product in products
+#     )
+
+#     # Lọc và lấy top 5 sản phẩm theo điểm số
+#     filtered_df = eligible_df.nlargest(5, 'Score')
+
+#     # Kiểm tra nếu sản phẩm chính có trong top 5 và loại bỏ các sản phẩm con khỏi danh sách
+#     main_products_df = filtered_df[
+#         ~filtered_df['Product'].isin(child_products)
+#     ]
+
+#     # Nếu sản phẩm chính (như 'pfm') có trong danh sách, thêm các sản phẩm con vào hiển thị
+#     eligible_info = ""
+#     for _, row in main_products_df.iterrows():
+#         product = row['Product']
+#         product_name = get_product_name(product, language)
+#         label = row['Label']
+#         link = f"https://timo.vn/products/{product}"
+
+#         # Kiểm tra nếu sản phẩm chính có các sản phẩm con
+#         if product in product_hierarchy:
+#             eligible_info += f"{product_name} - {label}\n"
+#             eligible_info += "**Sản phẩm này bao gồm:**\n"
+
+#             # Thêm các sản phẩm con vào hiển thị
+#             for sub_product in product_hierarchy[product]:
+#                 sub_product_name = get_product_name(sub_product, language)
+#                 # sub_link = f"https://timo.vn/products/{sub_product}"
+#                 eligible_info += f"- {sub_product_name}: {label}\n"
+#                 # eligible_info += f"  _Bạn có thể tìm hiểu thêm tại [Link]({sub_link})_\n"
+
+#         else:
+#             # Nếu không có sản phẩm con, hiển thị sản phẩm chính
+#             eligible_info += f"### {product_name} - {label}\n"
+#             eligible_info += f"_Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
+
+#         eligible_info += "\n"  # Thêm khoảng trắng giữa các sản phẩm
+
+#     return eligible_info
+
+def prepare_eligible_info(eligible_df, language, product_hierarchy):
+    # Tập hợp tất cả sản phẩm con để loại bỏ nếu sản phẩm chính đã được chọn
+    child_products = set(
+        product for products in product_hierarchy.values() for product in products
+    )
+
+    # Lọc và lấy top 5 sản phẩm theo điểm số
+    filtered_df = eligible_df.nlargest(5, 'Score')
+
+    # Lọc ra danh sách chỉ chứa sản phẩm chính (bỏ sản phẩm con nếu đã có sản phẩm chính)
+    main_products_df = filtered_df[~filtered_df['Product'].isin(child_products)]
+
+    eligible_info = ""
+    for _, row in main_products_df.iterrows():
+        product = row['Product']
+        product_name = get_product_name(product, language)
+        label = row['Label']
+        link = f"https://timo.vn/products/{product}"
+
+        # Kiểm tra nếu sản phẩm chính có các sản phẩm con
+        if product in product_hierarchy:
+            eligible_info += f"{product_name} - {label}\n"
+            eligible_info += f"_Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
+            eligible_info += "  **Sản phẩm này bao gồm:**"
+            
+            # Lấy sản phẩm con từ DataFrame và sắp xếp theo điểm số
+            child_df = eligible_df[
+                eligible_df['Product'].isin(product_hierarchy[product])
+            ].sort_values(by='Score', ascending=False)
+
+            # Thêm các sản phẩm con vào hiển thị
+            for _, child_row in child_df.iterrows():
+                sub_product_name = get_product_name(child_row['Product'], language)
+                sub_label = child_row['Label']
+                eligible_info += f"     - {sub_product_name}\n"
+
+        else:
+            # Nếu không có sản phẩm con, hiển thị sản phẩm chính
+            eligible_info += f"{product_name} - {label}\n"
+            eligible_info += f"_Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
+
+        eligible_info += "\n"  # Thêm khoảng trắng giữa các sản phẩm
 
     return eligible_info
+
 
 
 # Lấy top 5 sản phẩm từ bảng eligible
@@ -1004,7 +1182,7 @@ def prepare_necessary_info(necessary_df, eligible_df):
 
     # Chuẩn bị thông tin sản phẩm cần thiết sau khi lọc
     necessary_info = "\n".join([
-        f"- {row['Product']}: {row['Label']} "
+        f"- {get_product_name(row['Product'], language)}: {row['Label']} "
         f"_Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/{row['Product']})_"
         for _, row in filtered_necessary_df.iterrows()
     ])
@@ -1012,32 +1190,67 @@ def prepare_necessary_info(necessary_df, eligible_df):
     return necessary_info
 
 
-
-def generate_recommendation_for_eligible(eligible_df, final_scores, language, age):
+def generate_recommendation_for_eligible(eligible_df, final_scores, language, age, product_hierarchy):
+    # Tạo template từ file
     prompt_template = load_prompt_from_file('product_prompt_template.txt')
 
-    top_5_eligible_products = prepare_eligible_info(eligible_df, language)
-    eligible_info = prepare_eligible_info(eligible_df, language)
+    # Chuẩn bị danh sách sản phẩm mở rộng
+    eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
+
+    # Tập hợp tất cả các sản phẩm con
+    child_products = set(
+        product for products in product_hierarchy.values() for product in products
+    )
+    top_5_eligible = eligible_df
+    # Kiểm tra nếu sản phẩm mẹ nằm trong top 5
+    parent_in_top_5 = set(top_5_eligible['Product']).intersection(product_hierarchy.keys())
+
+    # Loại bỏ các sản phẩm con khỏi top 5 nếu sản phẩm mẹ đã có trong top 5
+    if parent_in_top_5:
+        top_5_eligible = top_5_eligible[~top_5_eligible['Product'].isin(child_products)]
+    else:
+        top_5_eligible = eligible_df.nlargest(5, 'Score')
+
+    # top_5_eligible = eligible_df[~eligible_df['Product'].isin(child_products)]
+    # top_5_eligible = top_5_eligible.nlargest(5, 'Score')
+
+    # Chuẩn bị danh sách top 5 sản phẩm để hiển thị
+    top_5_eligible_info = "\n".join([
+        f"{i + 1}. {get_product_name(row['Product'], language)} - {row['Label']}"
+        for i, row in top_5_eligible.iterrows()
+    ])
+
+
+
+    # Chuẩn bị thông tin về traits
+    traits_info = []
+    for trait, score in final_scores.items():
+        result = determine_score_level_and_description(trait, score)  # Trả về 2 giá trị (level, description)
+        if isinstance(result, tuple) and len(result) == 2:  # Kiểm tra nếu kết quả có đúng 2 phần tử
+            level, description = result
+            traits_info.append(f"Trait: {trait}, Score: {score} ({level}) - {description}")
+        else:
+            raise ValueError(f"Unexpected return from determine_score_level_and_description: {result}")
+
+    # Điều chỉnh tone và độ tuổi người dùng
     tone, age_group = adjust_tone_based_on_age(age)
 
-    # Chuẩn bị nội dung top 3 traits để điền vào prompt
-    traits_info = []
-    # for trait in top_3_traits:  # Thêm vòng lặp cho top 3 traits
-    for trait in final_scores:  # Lặp qua tất cả các traits trong final_scores
-        score = final_scores[trait]  # Lấy điểm số của trait hiện tại từ final_scores
-        score_level, score_description = determine_score_level_and_description(trait, score)
-        traits_info.append(f"Trait: {trait}, Score: {score} ({score_level}) - {score_description}")
-
+    # Format nội dung prompt với template
     prompt = prompt_template.format(
         traits_info='\n'.join(traits_info),
+        top_5_eligible_products=top_5_eligible_info,
         eligible_products=eligible_info,
-        top_5_eligible_products=top_5_eligible_products,
         language=language,
         tone=tone,
         age_group=age_group
     )
 
+    # Gọi hàm GPT để sinh nội dung từ prompt
     return generate_content_with_gpt(prompt)
+
+
+
+
 
 # Tạo nội dung cho sản phẩm cần thiết nếu có
 def generate_recommendation_for_necessary(necessary_df, eligible_df, final_scores, language, age):
@@ -1355,7 +1568,34 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+# Mã hóa hình ảnh 'tomi.png' thành chuỗi base64
+# def encode_image(image_path):
+#     with open(image_path, "rb") as img_file:
+#         return base64.b64encode(img_file.read()).decode()
 
+# # Đường dẫn đến ảnh 'tomi.png'
+# tomi_path = os.path.join("images", "Tomi-Sticker_Part1_18.png")
+
+# # Mã hóa ảnh
+# encoded_tomi = encode_image(tomi_path)
+
+# # CSS tùy chỉnh để hiển thị ảnh ở góc phải màn hình
+# st.markdown(
+#     f"""
+#     <style>
+#     .tomi-image {{
+#         position: fixed;
+#         top: 100px;  /* Điều chỉnh khoảng cách từ trên xuống */
+#         right: 200px;  /* Căn hình về phía bên phải */
+#         width: 150px;  /* Đặt kích thước ảnh */
+#         height: auto;
+#         z-index: 10;  /* Đảm bảo ảnh nằm trên các phần tử khác */
+#     }}
+#     </style>
+#     <img src="data:image/png;base64,{encoded_tomi}" class="tomi-image"/>
+#     """,
+#     unsafe_allow_html=True
+# )
 st.markdown(
     """
     <style>
@@ -1363,16 +1603,18 @@ st.markdown(
      /* Tạo lớp phủ nền riêng biệt */
     .bg-container {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
+        top:10;
+        bottom:10;
+        left: 0; /* Căn hình về bên phải */
+        width: 45%;  /* Đặt chiều rộng phù hợp để chiếm 1 phần màn hình */
         height: 100%;
         background-image: url('https://chiemtinhlaso.com/assets/images/hand_bg.png');
-        background-size: contain;
-        background-position: center;  /* Đảm bảo hình nền căn giữa */
-        background-repeat: no-repeat;
-        animation: rotate-bg 60s infinite linear;  /* Animation xoay vòng */
-        opacity: 0.05;  /* Điều chỉnh độ trong suốt */
+        background-size: contain;  /* Giữ tỉ lệ của hình ảnh */
+        background-position: left bottom;  /* Căn hình về bên phải và giữa theo chiều dọc */
+        background-repeat: no-repeat;  /* Không lặp lại hình ảnh */
+        opacity: 0.5;  /* Độ trong suốt */
+        animation: rotate-bg 3600s infinite linear;  /* Animation xoay vòng */
+        pointer-events: none;  /* Ngăn người dùng tương tác với hình nền */
     }
 
     /* Animation xoay vòng cho background */
@@ -1482,6 +1724,14 @@ st.markdown(
     /* Thay đổi màu nền của expander */
     [data-testid="stExpander"] {
         # background-color: rgba(240, 242, 246, 0.5); /* Thay đổi thành màu bạn muốn */
+        border: 1px solid #8A2BE2 !important;  /* Màu tím cho viền */
+        border-radius: 10px;  /* Bo tròn viền */
+        margin-bottom: 15px;
+    }
+    [data-testid="stExpander"] .streamlit-expanderHeader {
+        color: #8A2BE2 !important;  /* Màu tím cho tiêu đề */
+        font-weight: bold;
+        font-size: 28px !important; 
     }
     
     /* Thay đổi màu nền của table */
@@ -1616,12 +1866,12 @@ st.markdown(
 
     # Khi nhấn nút "Calculate", ẩn form và hiển thị kết quả
 if st.button(f"✨ {calculate_button_label} ✨"):
-            if not birth_place:
+            if not birth_place.strip():
                 # Hiển thị thông báo lỗi nếu chưa nhập địa điểm sinh
                 if language == "Tiếng Việt":
-                    st.sidebar.error("Bạn chưa nhập nơi sinh.")
+                    st.error("Bạn chưa nhập nơi sinh.")
                 else:
-                    st.sidebar.error("You haven't input your birth place.")
+                    st.error("You haven't input your birth place.")
             else:
                 lat, lon, timezone = get_location_and_timezone(birth_place)
                 positions = get_planet_positions(birth_date.year, birth_date.month, birth_date.day, hour, minute, lat, lon, timezone)
@@ -1664,6 +1914,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                 extracted_aspects = extract_relevant_aspects(formatted_aspects, relevant_planets)
 
                 final_scores = calculate_financial_traits(individual_planets, formatted_aspects)
+
                 average_scores = {trait: 3.0 for trait in final_scores.keys()}  # Ví dụ tất cả trung bình là 3.0
 
                 final_product_scores = calculate_product_scores_numpy(final_scores, product_keywords, keyword_to_trait_mapping, trait_weights_dict)
@@ -1692,7 +1943,8 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
                 # Phân loại sản phẩm theo Eligible và Necessary
                 eligible_products = [
-                    (product, result['Score'], result['Label'].replace("Cần thiết - ", "").replace("Necessary - ", ""))
+                    (product, result['Score'], label_names[current_language].get(result['Label'], result['Label']))
+                    # (product, result['Score'], result['Label'].replace("Cần thiết - ", "").replace("Necessary - ", ""))
                     for product, result in labeled_product_scores.items() 
                 ]
 
@@ -1801,6 +2053,11 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
             # Tạo tab với tên theo ngôn ngữ đã chọn
             tabs = st.tabs(tab_titles)
+            
+            # Hàm chuyển Markdown sang HTML nếu cần thiết
+            def markdown_to_html(markdown_text):
+                return re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', markdown_text)
+
 
             # Tab 1: Hiển thị vị trí các hành tinh
             with tabs[0]:
@@ -1814,17 +2071,25 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                     
 
             # Tab 2: Hiển thị Radar Chart cho các đặc điểm tài chính
-                    if 'report_cache' not in st.session_state:
-                        st.session_state.report_cache = load_report_cache_from_txt()
-                    if 'user_hash' not in st.session_state:
-                        st.session_state.user_hash = load_user_hash()
+                if 'report_cache' not in st.session_state:
+                    st.session_state.report_cache = load_report_cache_from_txt()
+                if 'user_hash' not in st.session_state:
+                    st.session_state.user_hash = load_user_hash()
 
             # with tabs[1]:
+                if not birth_place.strip():
+                    # Nếu thiếu nơi sinh, hiển thị thông báo lỗi và dừng các thao tác khác
+                    if language == "Tiếng Việt":
+                        st.error("Bạn vui lòng điền đầy đủ thông tin để  Tomi có thể tạo báo cáo nha")
+                    else:
+                        st.error("You haven't input your birth place.")
+                else:
+                    # Nếu đã nhập đầy đủ thông tin, tiếp tục hiển thị nội dung
                     if language == "Tiếng Việt":
                         st.write("### Biểu đồ dựa trên hành vi tài chính của bạn:")
                     else:
                         st.write("### Financial Traits Radar Chart:")
-
+                                            
                     plot_radar_chart(final_scores, average_scores, language)
 
                     # Từ điển dịch các traits từ tiếng Anh sang tiếng Việt
@@ -1851,10 +2116,44 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                     
                     # Sắp xếp các traits theo điểm từ cao đến thấp
                     sorted_traits = sorted(final_scores.items(), key=lambda x: x[1], reverse=True)
-                    
-                    # Tạo biến thông báo spinner dựa trên ngôn ngữ
-                    spinner_message = 'Đang tạo báo cáo... vui lòng chờ' if language == "Tiếng Việt" else 'Generating report... please wait'
+                    # Hàm mã hóa ảnh thành base64
+                    def encode_image(image_path):
+                        with open(image_path, "rb") as img_file:
+                            return base64.b64encode(img_file.read()).decode()
 
+                    # Đường dẫn đến ảnh tomi.png
+                    tomi_path = os.path.join("images", "Tomi.png")
+
+                    # Mã hóa ảnh tomi.png
+                    encoded_tomi = encode_image(tomi_path)
+                    # Tạo biến thông báo spinner dựa trên ngôn ngữ
+                    spinner_message = 'Tomi đang đọc biểu đồ sao của bạn, chờ Tomi tí xíu nhe!' if language == "Tiếng Việt" else 'Tomi is creating your report, please wait...'
+                    with st.spinner(spinner_message):
+                        # Hiển thị ảnh trong khi chờ load
+                        placeholder = st.empty()  # Tạo placeholder để quản lý nội dung
+                        placeholder.markdown(
+                            f"""
+                            <div style="display: flex; justify-content: center; align-items: center; height: 300px;">
+                                <img src="data:image/png;base64,{encoded_tomi}" width="200" class="floating">
+                            </div>
+                            <style>
+                            .floating {{
+                                animation: float 3s ease-in-out infinite;
+                            }}
+                            @keyframes float {{
+                                0% {{ transform: translateY(0px); }}
+                                50% {{ transform: translateY(-15px); }}
+                                100% {{ transform: translateY(0px); }}
+                            }}
+                            </style>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        # Giả lập quá trình xử lý (ví dụ 3 giây)
+                        time.sleep(3)
+
+                    # Xóa hình ảnh sau khi quá trình load kết thúc
+                    placeholder.empty()
                     # Nhận thông tin người dùng để tạo hash duy nhất
                     birth_date_str = birth_date.strftime("%Y-%m-%d")
                     birth_time_str = f"{hour:02}:{minute:02} {am_pm}"
@@ -1870,23 +2169,47 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                     # Kiểm tra nếu user_hash chưa có trong danh sách
                     if current_user_hash not in st.session_state.user_hash:
                         st.session_state.user_hash.append(current_user_hash)  # Thêm user_hash vào danh sách
-                        save_user_hash(current_user_hash)  # Lưu user_hash mới vào file
+                    #     save_user_hash(current_user_hash)  # Lưu user_hash mới vào file
 
                     # Kiểm tra nếu user_hash đã có trong cache
                     if current_user_hash in st.session_state.report_cache:
                         financial_traits_text, top_traits_description,eligible_content, necessary_content = st.session_state.report_cache[current_user_hash]
 
                         # Hiển thị lại nội dung từ cache
-                        with st.expander("**Chi tiết các đặc điểm tài chính**" if language == "Tiếng Việt" else "**Financial traits**", expanded=True):
-                            st.markdown(financial_traits_text, unsafe_allow_html=True)
+                        with st.expander("**Dựa vào Biểu Đồ, Tomi dự đoán rằng tính cách tài chính của bạn có thể có xu hướng sau:**" if language == "Tiếng Việt" else "###### **Based on the chart, Tomi can predict that your financial personality might tend to look like this:**", expanded=True):
+                            # st.markdown(financial_traits_text, unsafe_allow_html=True)
+                            st.markdown(
+                                f"""
+                                <div style="text-align: justify;">
+                                    {markdown_to_html(financial_traits_text)}</div>
+                                """,
+                                unsafe_allow_html=True
+                            )
 
                         st.write("### Nhận xét về hành vi tài chính:" if language == "Tiếng Việt" else "### Financial behavior insights:")
-                        with st.expander("**Nhận xét chi tiết**" if language == "Tiếng Việt" else "**Detailed financial behavior insights:**", expanded=True):
-                            st.write(top_traits_description)
+                        with st.expander("**Từ những thông tin trên, Tomi có thể thấy...**" if language == "Tiếng Việt" else "###### **From the above information, Tomi can tell that...**", expanded=True):
+                            # st.write(top_traits_description)
+                            st.markdown(
+                                f"""
+                                <div style="text-align: justify;">
+                                    {markdown_to_html(top_traits_description)}
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
                         st.write("                         ")
                         st.write("### Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
-                        with st.expander("**Đề xuất sản phẩm PHÙ HỢP**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
-                            st.write(eligible_content)
+                        with st.expander("**Theo Tomi dự đoán...** " if language == "Tiếng Việt" else "**From what Tomi see...**", expanded=True):
+                            # st.write(eligible_content)
+                            st.markdown(
+                                f"""
+                                <div style="text-align: justify;">
+                                    {markdown_to_html(eligible_content)}
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                            
 
                         # if language == "Tiếng Việt":
                         #     st.subheader("Bạn sẽ thích: ")
@@ -1904,8 +2227,16 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         st.write("                         ")
                         if necessary_content:
                             st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Product Recommendations:")
-                            with st.expander("**Đề xuất sản phẩm CẦN THIẾT**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
-                                st.write(necessary_content)
+                            with st.expander("**Theo Tomi thì...**" if language == "Tiếng Việt" else "**From Tomi aspect... **", expanded=True):
+                                # st.write(necessary_content)
+                                st.markdown(
+                                f"""
+                                <div style="text-align: justify;">
+                                    {markdown_to_html(necessary_content)}
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
 
                             # if language == "Tiếng Việt":
                             #     st.subheader("Bạn sẽ cần: ")
@@ -1924,21 +2255,52 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         # Tạo đoạn văn bản mô tả tất cả các traits với số thứ tự
                         financial_traits_text = ""
                         trait_colors = {
-                            "Adventurous": "blue",
-                            "Convenient": "purple",
-                            "Impulsive": "red",
-                            "Conservative": "orange",
-                            "Cautious": "#f1d800",
-                            "Analytical": "green",
-                            "Mạo hiểm": "blue",  # Adventurous
-                            "Tiện lợi": "purple",  # Convenient
-                            "Phóng khoáng": "red",  # Impulsive
-                            "Kiên định": "orange",  # Conservative
-                            "Cẩn trọng": "#f1d800",  # Cautious
-                            "Tỉ mỉ": "green"  # Analytical
+                            "Adventurous": "#2774ae",
+                            "Convenient": "#9D03C7",
+                            "Impulsive": "#d94b24",
+                            "Conservative": "#ff9425",
+                            "Cautious": "green",
+                            "Analytical": "#f1d800",
+                            "Mạo Hiểm": "#2774ae",  # Adventurous
+                            "Tiện Lợi": "#9D03C7",  # Convenient
+                            "Phóng Khoáng": "#d94b24",  # Impulsive
+                            "Kiên Định": "#ff9425",  # Conservative
+                            "Cẩn Trọng": "green",  # Cautious
+                            "Tỉ Mỉ": "#f1d800"  # Analytical
                                                 }
-                        
+                        # '#2774ae', '#9D03C7','#d94b24', '#ff9425','green', '#f1d800'] 
+                        start_time = time.time()
                         with st.spinner(spinner_message):
+                            # Hiển thị ảnh trong khi chờ load
+                            placeholder = st.empty()  # Tạo placeholder để quản lý nội dung
+                            placeholder.markdown(
+                                f"""
+                                <div style="display: flex; justify-content: center; align-items: center; height: 300px;">
+                                    <img src="data:image/png;base64,{encoded_tomi}" width="200" class="floating">
+                                </div>
+                                <style>
+                                .floating {{
+                                    animation: float 3s ease-in-out infinite;
+                                }}
+                                @keyframes float {{
+                                    0% {{ transform: translateY(0px); }}
+                                    50% {{ transform: translateY(-15px); }}
+                                    100% {{ transform: translateY(0px); }}
+                                }}
+                                </style>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                            # Giả lập quá trình xử lý báo cáo (ví dụ: chạy một số logic phức tạp)
+                            time.sleep(50)  # Thay bằng logic tạo báo cáo thực tế
+
+                            # Tính thời gian xử lý
+                            end_time = time.time()
+                            processing_time = end_time - start_time
+                            print (processing_time)
+
+                            # Xóa hình ảnh sau khi quá trình load kết thúc
+                            placeholder.empty()
                             for index, (trait, score) in enumerate(sorted_traits):
                                 if index == 0:
                                     note = " - cao nhất" if language == "Tiếng Việt" else " - highest"
@@ -1949,16 +2311,23 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
                                 # Lấy màu sắc dựa trên trait
                                 trait = get_translated_trait(trait, language)
-                                color = trait_colors.get(trait.capitalize(), "black")  # Mặc định là "black" nếu không có trong trait_colors
+                                color = trait_colors.get(trait.title(), "black")  # Mặc định là "black" nếu không có trong trait_colors
 
                                 description = get_trait_description_with_gpt(trait, score, language,age)
                                 
                                 # Sử dụng HTML để thay đổi màu sắc của trait
-                                financial_traits_text += f"{index + 1}. <b style='color:{color};'>{trait.capitalize()}</b> **({score:.3f}{note}):**\n\n {description}\n\n"
+                                financial_traits_text += f"{index + 1}. <b style='color:{color};'>{trait.title()}</b> **({score:.3f}{note}):**\n\n {description}\n\n"
 
                             # Hiển thị toàn bộ đoạn văn bản
                             with st.expander("**Chi tiết các đặc điểm tài chính**" if language == "Tiếng Việt" else "**Financial traits**", expanded=True):
-                                st.markdown(financial_traits_text, unsafe_allow_html=True)
+                                # st.markdown(financial_traits_text, unsafe_allow_html=True)
+                                st.markdown(
+                                    f"""
+                                    <div style="text-align: justify;">
+                                        {markdown_to_html(financial_traits_text)}</div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
 
                             # Hiển thị mô tả cho top 3 traits
                             top_3_traits = get_top_3_traits(final_scores)
@@ -1966,7 +2335,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                             top_traits_description = get_top_traits_description_with_gpt(top_3_traits,final_scores, language, age)
 
                             # product_content = get_product_recommendation_with_gpt(eligible_products, necessary_products, final_scores, language, age)
-                            eligible_content = generate_recommendation_for_eligible(eligible_df, final_scores, language, age)
+                            eligible_content = generate_recommendation_for_eligible(eligible_df, final_scores, language, age,product_hierarchy)
                             necessary_content = generate_recommendation_for_necessary(necessary_df, eligible_df, final_scores, language, age)
 
                             # Lưu báo cáo vào cache với user_hash
@@ -1978,15 +2347,31 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
                         # Sử dụng expander để ẩn/hiện phần nhận xét chi tiết
                         with st.expander("**Nhận xét chi tiết**" if language == "Tiếng Việt" else "**Detailed financial behavior insights:**", expanded=True):
-                            st.write(top_traits_description)
+                            # st.write(top_traits_description)
+                            st.markdown(
+                                f"""
+                                <div style="text-align: justify;">
+                                    {markdown_to_html(top_traits_description)}
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
                         
                         
                         # st.subheader("Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
                         st.write("                         ")
                         # Hiển thị nội dung sản phẩm
                         st.write("### Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
-                        with st.expander("**Đề xuất sản phẩm PHÙ HỢP**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
-                            st.write(eligible_content)
+                        with st.expander("**Theo Tomi dự đoán...**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
+                            # st.write(eligible_content)
+                            st.markdown(
+                                f"""
+                                <div style="text-align: justify;">
+                                    {markdown_to_html(eligible_content)}
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
                         
                         # if language == "Tiếng Việt":
                         #     st.subheader("Bạn sẽ thích: ")
@@ -2006,21 +2391,29 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                          # Chỉ hiển thị nếu có sản phẩm cần thiết
                         if necessary_content:
                             st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Necessary Product Recommendations:")
-                            with st.expander("**Đề xuất sản phẩm CẦN THIẾT**" if language == "Tiếng Việt" else "**Necessary Products**", expanded=True):
-                                st.write(necessary_content)
+                            with st.expander("**Đề Xuất Của Tomi**" if language == "Tiếng Việt" else "**Necessary Products**", expanded=True):
+                                # st.write(necessary_content)
+                                st.markdown(
+                                f"""
+                                <div style="text-align: justify;">
+                                    {markdown_to_html(necessary_content)}
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
                         
-                            # if language == "Tiếng Việt":
-                            #     st.subheader("Bạn sẽ cần: ")
-                            #     necessary_df['Score'] = necessary_df['Score'].round(2) 
-                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
-                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            # else:
-                            #     st.subheader("You will need: ")
-                            #     necessary_df['Score'] = necessary_df['Score'].round(2)  
-                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
-                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            if language == "Tiếng Việt":
+                                st.subheader("Bạn sẽ cần: ")
+                                necessary_df['Score'] = necessary_df['Score'].round(2) 
+                                # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                                necessary_df_display = necessary_df.drop(columns=['Score'])
+                                st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            else:
+                                st.subheader("You will need: ")
+                                necessary_df['Score'] = necessary_df['Score'].round(2)  
+                                # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                                necessary_df_display = necessary_df.drop(columns=['Score'])
+                                st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
                     
                         # Nếu không có trong cache, tạo nội dung sản phẩm mới với GPT
                             eligible_products = eligible_df[['Product', 'Label']].values.tolist()
@@ -2067,103 +2460,258 @@ if st.button(f"✨ {calculate_button_label} ✨"):
             st.write("                         ")
 
     # Nút Refresh để làm mới ứng dụng
-    
 if st.button(f"{refresh_button_label}"):
         st.experimental_rerun()
 
-# Hàm xóa cache từ session state và file txt
-def delete_cache_by_user_hash():
-    if 'report_cache' not in st.session_state:
-        st.session_state['report_cache'] = {}
+# Hàm mã hóa ảnh thành chuỗi base64
+def encode_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+# Đường dẫn tới ảnh QR code và các nút store
+qr_path = os.path.join("images", "qr.png")
+app_store_path = os.path.join("images", "ast.png")
+google_play_path =os.path.join("images", "adr.png")
+# Mã hóa các ảnh thành base64
+encoded_qr = encode_image(qr_path)
+encoded_app_store = encode_image(app_store_path)
+encoded_google_play = encode_image(google_play_path)
+
+# CSS tùy chỉnh cho section cuối cùng của trang
+st.markdown(
+    """
+    <style>
+    .end-section {
+        background-image: url('https://images.newscientist.com/wp-content/uploads/2023/07/03093742/sei162306009.jpg');
+        background-position: center;
+        # background-size: cover;
+        padding: 30px;
+        margin-top: 100px;  /* Tạo khoảng cách với nội dung phía trên */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;  /* Đảm bảo nội dung không bị tràn */
+    }
+    .content-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+    .content-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+    .footer-text {
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-size: 18px;
+        margin-top: 5px;
+    }
+    /* Modal Styles */
+    .modal {
+        display: none; /* Ẩn modal ban đầu */
+        position: fixed;
+        z-index: 11;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    .modal-content {
+        margin: 15% auto;
+        display: block;
+        width: 80%;
+        max-width: 500px;
+    }
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Nội dung cho từng ngôn ngữ
+footer_text = (
+    "Tải ứng dụng ngay để trải nghiệm sản phẩm được gợi ý bởi Astrotomi!."
+    if language == "Tiếng Việt"
+    else "Download the app now to try our products recommended by Astrotomi!."
+)
+
+# HTML hiển thị QR code và các nút tải app theo bố cục
+st.markdown(
+    f"""
+    <div class="end-section">
+        <div class="content-row">
+            <div class="content-center">
+                <img src="data:image/png;base64,{encoded_qr}" width="150" style="cursor: pointer;" onclick="openModal()"/>
+            </div>
+            <div class="content-center">
+                <a href="https://app.adjust.com/1h1f5pz7" target="_blank">
+                    <img src="data:image/png;base64,{encoded_app_store}" width="160" style="cursor: pointer;"/>
+                </a>
+                <a href="https://app.adjust.com/1hccdzw5?fallback=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dio.lifestyle.plus%26hl%3D&redirect_macos=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dio.lifestyle.plus%26hl%3D" target="_blank">
+                    <img src="data:image/png;base64,{encoded_google_play}" width="160" style="cursor: pointer;"/>
+                </a>
+            </div>
+        </div>
+        <div class="footer-text">{footer_text}</div>
+    </div>
+
+    <!-- Modal Popup -->
+    <div id="qrModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage" src="data:image/png;base64,{encoded_qr}">
+    </div>
+    <!-- Modal Popup -->
+    <div id="qrModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" src="data:image/png;base64,{encoded_qr}">
+    </div>
+
+    <script>
+    function openModal() {{
+        document.getElementById("qrModal").style.display = "flex";
+    }}
+
+    function closeModal() {{
+        document.getElementById("qrModal").style.display = "none";
+    }}
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+# CSS và HTML cho Footer
+footer = """
+    <style>
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #6A0DAD;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-size: 16px;
+        z-index: 100;
+    }
+    </style>
+    <div class="footer">
+        <p>🌟 Được phát triển bởi đội ngũ Timo | <a style='color: #FFD700;' href="https://timo.vn" target="_blank">Timo.vn</a> 🌟</p>
+    </div>
+"""
+# Hiển thị footer trên Streamlit
+st.markdown(footer, unsafe_allow_html=True)
+
+
+# # Hàm xóa cache từ session state và file txt
+# def delete_cache_by_user_hash():
+#     if 'report_cache' not in st.session_state:
+#         st.session_state['report_cache'] = {}
     
-    # Nhập user_hash để xóa cache
-    user_hash_input = st.text_input("Enter User Hash to delete cache:")
+#     # Nhập user_hash để xóa cache
+#     user_hash_input = st.text_input("Enter User Hash to delete cache:")
     
-    if st.button("Delete Cache"):
-        # Xóa cache trong session state
-        if user_hash_input in st.session_state['report_cache']:
-            del st.session_state['report_cache'][user_hash_input]
-            st.success(f"Cache for user_hash: {user_hash_input} has been deleted from session.")
-        else:
-            st.warning(f"No cache found for user_hash: {user_hash_input} in session.")
+#     if st.button("Delete Cache"):
+#         # Xóa cache trong session state
+#         if user_hash_input in st.session_state['report_cache']:
+#             del st.session_state['report_cache'][user_hash_input]
+#             st.success(f"Cache for user_hash: {user_hash_input} has been deleted from session.")
+#         else:
+#             st.warning(f"No cache found for user_hash: {user_hash_input} in session.")
         
-        # Xóa cache từ file txt
-        if delete_cache_from_txt(user_hash_input):
-            st.success(f"Cache for user_hash: {user_hash_input} has been deleted from file.")
-        else:
-            st.warning(f"No cache found for user_hash: {user_hash_input} in file.")
+#         # Xóa cache từ file txt
+#         if delete_cache_from_txt(user_hash_input):
+#             st.success(f"Cache for user_hash: {user_hash_input} has been deleted from file.")
+#         else:
+#             st.warning(f"No cache found for user_hash: {user_hash_input} in file.")
 
-# Hàm xóa cache khỏi file report_cache.txt
-def delete_cache_from_txt(user_hash_to_delete):
-    try:
-        # Đọc tất cả các dòng từ file
-        with open('txt3.txt', 'r') as file:
-            lines = file.readlines()
+# # Hàm xóa cache khỏi file report_cache.txt
+# def delete_cache_from_txt(user_hash_to_delete):
+#     try:
+#         # Đọc tất cả các dòng từ file
+#         with open('txt3.txt', 'r') as file:
+#             lines = file.readlines()
         
-        # Viết lại file, bỏ qua user_hash cần xóa
-        with open('txt3.txt', 'w') as file:
-            cache_found = False
-            for line in lines:
-                if not line.startswith(user_hash_to_delete):  # Nếu không phải là user_hash cần xóa
-                    file.write(line)
-                else:
-                    cache_found = True
+#         # Viết lại file, bỏ qua user_hash cần xóa
+#         with open('txt3.txt', 'w') as file:
+#             cache_found = False
+#             for line in lines:
+#                 if not line.startswith(user_hash_to_delete):  # Nếu không phải là user_hash cần xóa
+#                     file.write(line)
+#                 else:
+#                     cache_found = True
         
-        return cache_found  # Trả về True nếu tìm thấy và xóa user_hash, False nếu không
-    except FileNotFoundError:
-        return False
+#         return cache_found  # Trả về True nếu tìm thấy và xóa user_hash, False nếu không
+#     except FileNotFoundError:
+#         return False
 
-# *** Thêm phần Admin Access và Cache Management ***
-ADMIN_PASSWORD = "admin123"  
+# # *** Thêm phần Admin Access và Cache Management ***
+# ADMIN_PASSWORD = "admin123"  
 
-st.sidebar.subheader("   ABOUT US   ")
+# st.sidebar.subheader("   ABOUT US   ")
 
 
 
-# Hàm kiểm tra đăng nhập admin
-def admin_access():
-    st.sidebar.subheader("Admin Access")
-    admin_password_input = st.sidebar.text_input("Enter Admin Password:", type="password")
+# # Hàm kiểm tra đăng nhập admin
+# def admin_access():
+#     st.sidebar.subheader("Admin Access")
+#     admin_password_input = st.sidebar.text_input("Enter Admin Password:", type="password")
     
-    if st.sidebar.button("Login as Admin"):
-        if admin_password_input == ADMIN_PASSWORD:
-            st.session_state['is_admin'] = True
-            st.sidebar.success("Logged in as Admin")
-        else:
-            st.sidebar.error("Invalid Admin Password")
+#     if st.sidebar.button("Login as Admin"):
+#         if admin_password_input == ADMIN_PASSWORD:
+#             st.session_state['is_admin'] = True
+#             st.sidebar.success("Logged in as Admin")
+#         else:
+#             st.sidebar.error("Invalid Admin Password")
 
-# Hàm đăng xuất admin
-def admin_logout():
-    if st.sidebar.button("Logout"):
-        st.session_state['is_admin'] = False
-        st.sidebar.success("Logged out successfully.")
+# # Hàm đăng xuất admin
+# def admin_logout():
+#     if st.sidebar.button("Logout"):
+#         st.session_state['is_admin'] = False
+#         st.sidebar.success("Logged out successfully.")
 
-# Kiểm tra xem admin đã đăng nhập chưa
-if 'is_admin' not in st.session_state:
-    st.session_state['is_admin'] = False
+# # Kiểm tra xem admin đã đăng nhập chưa
+# if 'is_admin' not in st.session_state:
+#     st.session_state['is_admin'] = False
 
-# Giao diện cho admin sau khi đăng nhập
-if st.session_state['is_admin']:
-    # Thêm các tab cho admin quản lý
-    tab1, tab2 = st.tabs(["User Dashboard", "Admin Panel"])
+# # Giao diện cho admin sau khi đăng nhập
+# if st.session_state['is_admin']:
+#     # Thêm các tab cho admin quản lý
+#     tab1, tab2 = st.tabs(["User Dashboard", "Admin Panel"])
 
-    # Tab hiển thị danh sách user_hash
-    with tab1:
-        st.subheader("Saved User Hashes")
-        if 'report_cache' in st.session_state:
-            if len(st.session_state['report_cache']) > 0:
-                for user_hash in st.session_state['report_cache'].keys():
-                    st.write(user_hash)
-            else:
-                st.write("No user hash found.")
-        else:
-            st.write("No user hash found.")
+#     # Tab hiển thị danh sách user_hash
+#     with tab1:
+#         st.subheader("Saved User Hashes")
+#         if 'report_cache' in st.session_state:
+#             if len(st.session_state['report_cache']) > 0:
+#                 for user_hash in st.session_state['report_cache'].keys():
+#                     st.write(user_hash)
+#             else:
+#                 st.write("No user hash found.")
+#         else:
+#             st.write("No user hash found.")
     
-    # Tab admin panel để xóa cache và logout
-    with tab2:
-        st.subheader("Admin Panel")
-        delete_cache_by_user_hash()  # Xóa cache
-        admin_logout()  # Đăng xuất admin
-else:
-    # Nếu chưa đăng nhập, hiển thị giao diện đăng nhập
-    admin_access()
+#     # Tab admin panel để xóa cache và logout
+#     with tab2:
+#         st.subheader("Admin Panel")
+#         delete_cache_by_user_hash()  # Xóa cache
+#         admin_logout()  # Đăng xuất admin
+# else:
+#     # Nếu chưa đăng nhập, hiển thị giao diện đăng nhập
+#     admin_access()
