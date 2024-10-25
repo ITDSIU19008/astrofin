@@ -2255,7 +2255,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 financial_traits_text += f"{index + 1}. <b style='color:{color};'>{trait.title()}</b> **({score:.3f}{note}):**\n\n {description}\n\n"
 
                             # Hiển thị toàn bộ đoạn văn bản
-                            with st.expander("**Chi tiết các đặc điểm tài chính**" if language == "Tiếng Việt" else "**Financial traits**", expanded=True):
+                            with st.expander("**Dựa vào Biểu Đồ, Tomi dự đoán rằng tính cách tài chính của bạn có thể có xu hướng sau:**" if language == "Tiếng Việt" else "###### **Based on the chart, Tomi can predict that your financial personality might tend to look like this:**", expanded=True):
                                 # st.markdown(financial_traits_text, unsafe_allow_html=True)
                                 st.markdown(
                                     f"""
@@ -2294,11 +2294,10 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                             )
                         
                         
-                        # st.subheader("Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
                         st.write("                         ")
                         # Hiển thị nội dung sản phẩm
                         st.write("### Sản phẩm tài chính của Timo nào sẽ phù hợp với tôi đây?" if language == "Tiếng Việt" else "### Which Timo financial product would be the best fit for me?")                        
-                        with st.expander("**Theo Tomi dự đoán...**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
+                        with st.expander("**Theo Tomi dự đoán...** " if language == "Tiếng Việt" else "**From what Tomi see...**", expanded=True):
                             # st.write(eligible_content)
                             st.markdown(
                                 f"""
@@ -2327,7 +2326,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                          # Chỉ hiển thị nếu có sản phẩm cần thiết
                         if necessary_content:
                             st.write("### Tôi nên sử dụng sản phẩm nào để tối ưu tài chính?" if language == "Tiếng Việt" else "### Which product should I use to optimize my finances?")
-                            with st.expander("**Đề Xuất Của Tomi**" if language == "Tiếng Việt" else "**Necessary Products**", expanded=True):
+                            with st.expander("**Theo Tomi thì...**" if language == "Tiếng Việt" else "**From Tomi aspect... **", expanded=True):
                                 # st.write(necessary_content)
                                 st.markdown(
                                 f"""
