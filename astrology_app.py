@@ -1097,58 +1097,40 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
     # Tập hợp tất cả các sản phẩm con
     child_products = set(product for products in product_hierarchy.values() for product in products)
 
-    # Lấy danh sách top 20 sản phẩm theo điểm
-    top_20_eligible = eligible_df.nlargest(10, 'Score')
+    # Lấy danh sách top 10 sản phẩm theo điểm để kiểm tra sự có mặt của sản phẩm mẹ
+    top_10_eligible = eligible_df.nlargest(10, 'Score')
 
-    # Kiểm tra nếu sản phẩm mẹ nằm trong top 20
-    parent_in_top_20 = set(top_20_eligible['Product']).intersection(product_hierarchy.keys())
+    # Kiểm tra nếu sản phẩm mẹ nằm trong top 10
+    parent_in_top_10 = set(top_10_eligible['Product']).intersection(product_hierarchy.keys())
 
-    # Nếu sản phẩm mẹ nằm trong top 20, xử lý sản phẩm con
-    if parent_in_top_20:
-        # Lọc các sản phẩm con có nhãn "Rất phù hợp" hoặc "Phù hợp"
-        child_products_in_top_5 = top_20_eligible[
-            (top_20_eligible['Product'].isin(child_products)) &
-            (top_20_eligible['Label'].isin(
-                [
-                    "Rất phù hợp", "Phù hợp", "Very Suitable", "Suitable",
-                    "Cần thiết - Rất phù hợp", "Cần thiết - Phù hợp",
-                    "Necessary - Very Suitable", "Necessary - Suitable"
-                ]
-            )) &
-            (top_20_eligible['Score'] >= top_20_eligible.nlargest(5, 'Score')['Score'].min())
-        ]
-    
-        # Kiểm tra nếu có sản phẩm mẹ trong top 5
-        parent_in_top_5 = set(
-            top_20_eligible.nlargest(5, 'Score')['Product']
-        ).intersection(product_hierarchy.keys())
-    
-        # Nếu sản phẩm mẹ và con đều nằm trong top 5, chỉ giữ mẹ và loại bỏ con
-        if parent_in_top_5:
-            top_5_eligible = top_20_eligible[
-                ~top_20_eligible['Product'].isin(child_products)
-            ].nlargest(5, 'Score')
-        elif len(child_products_in_top_5) >= 3:
-            # Nếu có ít nhất 4 sản phẩm con, loại bỏ tất cả các sản phẩm con
-            top_5_eligible = top_20_eligible[
-                ~top_20_eligible['Product'].isin(child_products)
-            ]
-        else:
-            # Nếu không đủ 4 sản phẩm con, giữ lại top 5 theo điểm
-            top_5_eligible = top_20_eligible.nlargest(5, 'Score')
+    # Lọc ra các sản phẩm con nằm trong top 5 và kiểm tra nhãn phù hợp
+    child_products_in_top_5 = top_10_eligible[
+        (top_10_eligible['Product'].isin(child_products)) &
+        (top_10_eligible['Label'].isin([
+            "Rất phù hợp", "Phù hợp", "Very Suitable", "Suitable", 
+            "Cần thiết - Rất phù hợp", "Cần thiết - Phù hợp", 
+            "Necessary - Very Suitable", "Necessary - Suitable"
+        ]))
+    ].nlargest(5, 'Score')
+
+    # Kiểm tra nếu sản phẩm mẹ nằm trong top 5
+    parent_in_top_5 = set(
+        top_10_eligible.nlargest(5, 'Score')['Product']
+    ).intersection(product_hierarchy.keys())
+
+    # Xử lý logic loại bỏ sản phẩm con nếu có đủ điều kiện
+    if parent_in_top_10 and len(child_products_in_top_5) >= 3:
+        # Nếu sản phẩm mẹ nằm trong top 10 và có 3+ sản phẩm con trong top 5, loại bỏ các sản phẩm con
+        top_5_eligible = top_10_eligible[~top_10_eligible['Product'].isin(child_products)].nlargest(5, 'Score')
+    elif parent_in_top_5:
+        # Nếu sản phẩm mẹ và sản phẩm con đều nằm trong top 5, loại bỏ sản phẩm con
+        top_5_eligible = top_10_eligible[~top_10_eligible['Product'].isin(child_products)].nlargest(5, 'Score')
     else:
-        # Nếu không có sản phẩm mẹ trong top 20, giữ nguyên top 5 theo điểm
-        top_5_eligible = top_20_eligible.nlargest(5, 'Score')
+        # Nếu chỉ sản phẩm mẹ hoặc 1 sản phẩm con nằm trong top 5, giữ nguyên top 5 theo điểm
+        top_5_eligible = top_10_eligible.nlargest(5, 'Score')
 
-        
     # Chuẩn bị danh sách sản phẩm mở rộng
     eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
-
-    # Chuẩn bị danh sách top 5 sản phẩm để hiển thị
-    top_5_eligible_info = "\n".join([
-        f"{i + 1}. {get_product_name(row['Product'], language)} - {row['Label']}"
-        for i, row in top_5_eligible.iterrows()
-    ])
 
     # Chuẩn bị danh sách top 5 sản phẩm để hiển thị
     top_5_eligible_info = "\n".join([
@@ -1159,7 +1141,7 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
     # Chuẩn bị thông tin về traits
     traits_info = []
     for trait, score in final_scores.items():
-        result = determine_score_level_and_description(trait, score)  # Trả về (level, description)
+        result = determine_score_level_and_description(trait, score)
         if isinstance(result, tuple) and len(result) == 2:
             level, description = result
             traits_info.append(f"Trait: {trait}, Score: {score} ({level}) - {description}")
