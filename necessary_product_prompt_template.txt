@@ -33,5 +33,5 @@ Beyond the products that suit you, here are some additional ones you may need to
    _Bạn có thể tìm hiểu thêm tại/ You can learn more about this at [Link](https://timo.vn/products/..._
 5.**nếu ngôn ngữ = {language}, dùng tên {language} của sản phẩm đó, ví dụ Money Pot: Hũ Chi Tiêu, Term Deposit: Tài Khoản Tiết Kiệm,...**
 6. **Nếu Ngôn Ngữ là {language}, cần sử dụng thuần {language} toàn bộ văn bản**
-7. ** chỉ lấy các sản phẩm trong {necessary_products} (không cần đề cập tới label) để viết bài.
+7. ** chỉ lấy các sản phẩm trong {necessary_products} (không cần đề cập tới label) để viết bài
 8. **kết bài nên đặt cảm xúc vào và đừng máy móc quá)

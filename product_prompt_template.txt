@@ -31,11 +31,40 @@ ví dụ tiếng anh: Based on your prominent personality traits such as ** firs
 -> Dựa trên các đặc điểm tính cách nổi bật như (liệt kê 3 tính cách điểm cao (+ điểm của chúng), bạn...
 -> Based on your prominent personality traits such as (liệt kê 3 tính cách điểm cao (+ there score), you...
 
-1. ** lấy đủ top 5 sản phẩm trong {top_5_eligible_products} để viết bài. Do not take products from other places or make them up by yourself **
-2. **Sản phẩm phù hợp:** Danh sách các sản phẩm phù hợp lấy từ {top_5_eligible_products} và {traits_info}, nêu bật lợi ích chính và lý do tại sao khách hàng sẽ thích từng sản phẩm.  
+**. **Ví dụ Cách Hiển Thị tên sản phẩm:**
+
+- **Tiếng Việt:**  
+  **Hũ Chi Tiêu (Money Pot)** - Giúp bạn...  
+  _Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/money-pot)_  
+
+- **English:**  
+  **Money Pot (Hũ Chi Tiêu)** - Helps you...  
+  _Learn more about this at [Link](https://timo.vn/products/money-pot)_
+
+1. ** lấy đủ top 5 sản phẩm trong {top_5_eligible_products} để viết bài.**
+
+Nếu một sản phẩm có các sản phẩm con, chúng sẽ được liệt kê bên dưới với mô tả phù hợp. Ví dụ:
+**Quản Lý Tài Chính Cá Nhân (Personal Financial Management)**: Sản phẩm này giúp bạn...
+**Sản phẩm này bao gồm: (liệt kể dủ các sản phẩm con kèm mô tả của chúng)**
+        ví dụ:
+   (lùi ô để thể hiện được đây là sản phẩm con)     - **Dự Đoán Thu Chi (Spending Prediction):** Giúp bạn...
+   (lùi ô để thể hiện được đây là sản phẩm con)       - **Báo Cáo Thu Chi (Cashflow Report):** _Mô tả...
+    (lùi ô để thể hiện được đây là sản phẩm con)      tương tự **{eligible_products}:** _mô tả...
+sản phẩm con cuối cùng phải cách hàng \n\n
+
+2. **Sản phẩm phù hợp:** **Danh sách các sản phẩm phù hợp lấy từ {top_5_eligible_products} và {traits_info}, nêu bật lợi ích chính và lý do tại sao khách hàng sẽ thích từng sản phẩm.  **
 3. **Giọng văn:** {tone}, nhắm đến đối tượng: {age_group}.
 4. **Chèn liên kết:** Với mỗi sản phẩm, hãy thêm liên kết cuối mỗi mô tả như sau:  
    _Bạn có thể tìm hiểu thêm tại/ learn more about this at [Link](https://...)_
 5. **nếu ngôn ngữ = {language}, chỉ dùng tên {language} của sản phẩm đó, ví dụ Money Pot: Hũ Chi Tiêu, Overdraft: Thấu Chi,...**
 6. **Nếu Ngôn Ngữ là {language}, cần sử dụng thuần {language} toàn bộ văn bản**
+7. **Ví dụ Cách Hiển Thị:**
+
+- **Tiếng Việt:**  
+  **Hũ Chi Tiêu (Money Pot)**  Sản phẩm này giúp bạn...  
+  _Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/money-pot)_  
+
+- **English:**  
+  **Money Pot (Hũ Chi Tiêu)**  This product helps you...  
+  _Learn more about this at [Link](https://timo.vn/products/money-pot)_
 
