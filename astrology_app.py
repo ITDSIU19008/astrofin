@@ -2459,9 +2459,22 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
             st.write("                         ")
 
-    # Nút Refresh để làm mới ứng dụng
+#     # Nút Refresh để làm mới ứng dụng
+# if st.button(f"{refresh_button_label}"):
+#         st.experimental_rerun()
+
+# Đặt cờ refresh trong session_state nếu chưa có
+if 'need_rerun' not in st.session_state:
+    st.session_state.need_rerun = False
+
+# Nút Refresh để kích hoạt refresh
 if st.button(f"{refresh_button_label}"):
-        st.experimental_rerun()
+    st.session_state.need_rerun = True  # Đặt cờ để kích hoạt refresh
+
+# Kiểm tra cờ và thực hiện refresh nếu cần
+if st.session_state.need_rerun:
+    st.session_state.need_rerun = False  # Tắt cờ sau khi refresh
+    st.experimental_rerun()  # Chỉ refresh, không mất cache
 
 # Hàm mã hóa ảnh thành chuỗi base64
 def encode_image(image_path):
