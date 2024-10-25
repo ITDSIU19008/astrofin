@@ -2110,9 +2110,9 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
                     # Generate nhận xét từ tất cả các traits
                     if language == "Tiếng Việt":
-                        st.write("### Mô tả về dựa trên tính cách:")
+                        st.write("### Dựa vào các thông tin bạn cung cấp, để xem biểu đồ tài chính của bạn ra sao nhé")
                     else:
-                        st.write("### Trait Descriptions:")
+                        st.write("### Based on the information you provide, let’s see what your financial chart looks like!")
                     
                     # Sắp xếp các traits theo điểm từ cao đến thấp
                     sorted_traits = sorted(final_scores.items(), key=lambda x: x[1], reverse=True)
@@ -2186,7 +2186,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 unsafe_allow_html=True
                             )
 
-                        st.write("### Nhận xét về hành vi tài chính:" if language == "Tiếng Việt" else "### Financial behavior insights:")
+                        st.write("### Hmmm ... Vậy **tính cách** tài chính của tôi là gì nhỉ?" if language == "Tiếng Việt" else "### Hmmm ... So, what’s my financial tendencies?")
                         with st.expander("**Từ những thông tin trên, Tomi có thể thấy...**" if language == "Tiếng Việt" else "###### **From the above information, Tomi can tell that...**", expanded=True):
                             # st.write(top_traits_description)
                             st.markdown(
@@ -2198,7 +2198,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 unsafe_allow_html=True
                             )
                         st.write("                         ")
-                        st.write("### Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
+                        st.write("### Sản phẩm tài chính của Timo nào sẽ phù hợp với tôi đây?" if language == "Tiếng Việt" else "### Which Timo financial product would be the best fit for me?")
                         with st.expander("**Theo Tomi dự đoán...** " if language == "Tiếng Việt" else "**From what Tomi see...**", expanded=True):
                             # st.write(eligible_content)
                             st.markdown(
@@ -2226,7 +2226,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         
                         st.write("                         ")
                         if necessary_content:
-                            st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Product Recommendations:")
+                            st.write("### Tôi nên sử dụng sản phẩm nào để tối ưu tài chính?" if language == "Tiếng Việt" else "### Which product should I use to optimize my finances?")
                             with st.expander("**Theo Tomi thì...**" if language == "Tiếng Việt" else "**From Tomi aspect... **", expanded=True):
                                 # st.write(necessary_content)
                                 st.markdown(
@@ -2375,7 +2375,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                             # Lưu báo cáo vào file txt để sử dụng lại khi khởi động lại ứng dụng
                             append_report_cache_to_txt(current_user_hash, financial_traits_text, top_traits_description,  eligible_content,necessary_content)
                         # Hiển thị tiêu đề nhận xét tổng quát dựa trên ngôn ngữ được chọn
-                        st.write("### Nhận xét về hành vi tài chính:" if language == "Tiếng Việt" else "### Financial behavior insights:")
+                        st.write("### Hmmm ... Vậy **tính cách** tài chính của tôi là gì nhỉ?" if language == "Tiếng Việt" else "### Hmmm ... So, what’s my financial tendencies?")
 
                         # Sử dụng expander để ẩn/hiện phần nhận xét chi tiết
                         with st.expander("**Nhận xét chi tiết**" if language == "Tiếng Việt" else "**Detailed financial behavior insights:**", expanded=True):
@@ -2393,7 +2393,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         # st.subheader("Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
                         st.write("                         ")
                         # Hiển thị nội dung sản phẩm
-                        st.write("### Giới thiệu về sản phẩm tài chính phù hợp:" if language == "Tiếng Việt" else "### Product Recommendations:")
+                        st.write("### Sản phẩm tài chính của Timo nào sẽ phù hợp với tôi đây?" if language == "Tiếng Việt" else "### Which Timo financial product would be the best fit for me?")                        
                         with st.expander("**Theo Tomi dự đoán...**" if language == "Tiếng Việt" else "**Product Recommendations:**", expanded=True):
                             # st.write(eligible_content)
                             st.markdown(
@@ -2422,7 +2422,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 
                          # Chỉ hiển thị nếu có sản phẩm cần thiết
                         if necessary_content:
-                            st.write("### Giới thiệu về sản phẩm tài chính cần thiết:" if language == "Tiếng Việt" else "### Necessary Product Recommendations:")
+                            st.write("### Tôi nên sử dụng sản phẩm nào để tối ưu tài chính?" if language == "Tiếng Việt" else "### Which product should I use to optimize my finances?")
                             with st.expander("**Đề Xuất Của Tomi**" if language == "Tiếng Việt" else "**Necessary Products**", expanded=True):
                                 # st.write(necessary_content)
                                 st.markdown(
