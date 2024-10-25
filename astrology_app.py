@@ -2014,12 +2014,12 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                 tab_titles = ["Tính Cách Tài Chính", "Đánh giá"]
                 # rating_label = "Đánh giá ứng dụng từ 1 đến 5 sao"
                 # comment_label = "Bình luận về ứng dụng"
-                feedback_message = "### Hãy chọn mức độ bạn cảm thấy khi trải nghiệm bản beta của ASTROTOMI!"
+                feedback_message = "### Hãy giúp Tomi chọn mức độ hài lòng mà bạn cảm thấy khi trải nghiệm bản beta của ASTROTOMI nha!"
             else:
                 tab_titles = ["Financial Traits", "Feedback"]
                 # rating_label = "Rate the app from 1 to 5 stars"
                 # comment_label = "Comment on the app"
-                feedback_message = "### Please select how you feel about the ASTROTOMI beta experience!"
+                feedback_message = "### Please help Tomi select how you feel about the ASTROTOMI beta experience!"
 
             # Đường dẫn đến các ảnh sticker đã lưu cục bộ
             sticker_1_path = os.path.join("images", "Tomi-Sticker_Part1_18.png")
@@ -2027,8 +2027,8 @@ if st.button(f"✨ {calculate_button_label} ✨"):
             sticker_3_path = os.path.join("images", "Tomi-Sticker_Part1_36.png")
             # Văn bản cho các sticker theo ngôn ngữ
             texts = {
-                "Tiếng Việt": ["Chán òm", "Mehhh", "Xịn zzzz"],
-                "English": ["Not Interested", "So-So", "Amazing!"]
+                "Tiếng Việt": ["Chán òm", "Hơi khó hiểu~~", "Tuyệt vời!!"],
+                "English": ["Not Interested", "So-So~~", "Amazing!"]
             }
 
             def display_sticker(image_path, link, width=100, text=""):
@@ -2250,7 +2250,39 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                             #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
                             #     necessary_df_display = necessary_df.drop(columns=['Score'])
                             #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                    
+                                            # Sử dụng expander để ẩn/hiện phần nhận xét chi tiết
+                        # Tải ảnh và mã hóa base64
+                        sticker_1 = base64.b64encode(open(sticker_1_path, "rb").read()).decode()
+                        sticker_2 = base64.b64encode(open(sticker_2_path, "rb").read()).decode()
+                        sticker_3 = base64.b64encode(open(sticker_3_path, "rb").read()).decode()
+
+                        # Tab Đánh giá
+                        with st.expander(feedback_message, expanded=True):
+                            st.markdown(
+                                f"""
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                                    <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                        <a href="https://not-interested.streamlit.app/" target="_blank">
+                                            <img src="data:image/png;base64,{sticker_1}" width="100" style="cursor: pointer;"/>
+                                        </a>
+                                        <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][0]}</p>
+                                    </div>
+                                    <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                        <a href="https://mehh-soso.streamlit.app/" target="_blank">
+                                            <img src="data:image/png;base64,{sticker_2}" width="100" style="cursor: pointer;"/>
+                                        </a>
+                                        <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][1]}</p>
+                                    </div>
+                                    <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                        <a href="https://good-job.streamlit.app/" target="_blank">
+                                            <img src="data:image/png;base64,{sticker_3}" width="100" style="cursor: pointer;"/>
+                                        </a>
+                                        <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][2]}</p>
+                                    </div>
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
                     else:
                         # Tạo đoạn văn bản mô tả tất cả các traits với số thứ tự
                         financial_traits_text = ""
@@ -2292,7 +2324,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 unsafe_allow_html=True
                             )
                             # Giả lập quá trình xử lý báo cáo (ví dụ: chạy một số logic phức tạp)
-                            time.sleep(50)  # Thay bằng logic tạo báo cáo thực tế
+                            time.sleep(60)  # Thay bằng logic tạo báo cáo thực tế
 
                             # Tính thời gian xử lý
                             end_time = time.time()
@@ -2418,11 +2450,45 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         # Nếu không có trong cache, tạo nội dung sản phẩm mới với GPT
                             eligible_products = eligible_df[['Product', 'Label']].values.tolist()
                             necessary_products = necessary_df[['Product', 'Score', 'Label']].values.tolist()
+                        
+                        # Sử dụng expander để ẩn/hiện phần nhận xét chi tiết
+                        # Tải ảnh và mã hóa base64
+                        sticker_1 = base64.b64encode(open(sticker_1_path, "rb").read()).decode()
+                        sticker_2 = base64.b64encode(open(sticker_2_path, "rb").read()).decode()
+                        sticker_3 = base64.b64encode(open(sticker_3_path, "rb").read()).decode()
 
+                        # Tab Đánh giá
+                        with st.expander(feedback_message, expanded=True):
+                            st.markdown(
+                                f"""
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                                    <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                        <a href="https://not-interested.streamlit.app/" target="_blank">
+                                            <img src="data:image/png;base64,{sticker_1}" width="100" style="cursor: pointer;"/>
+                                        </a>
+                                        <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][0]}</p>
+                                    </div>
+                                    <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                        <a href="https://mehh-soso.streamlit.app/" target="_blank">
+                                            <img src="data:image/png;base64,{sticker_2}" width="100" style="cursor: pointer;"/>
+                                        </a>
+                                        <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][1]}</p>
+                                    </div>
+                                    <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                        <a href="https://good-job.streamlit.app/" target="_blank">
+                                            <img src="data:image/png;base64,{sticker_3}" width="100" style="cursor: pointer;"/>
+                                        </a>
+                                        <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][2]}</p>
+                                    </div>
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
+                        
             # Tab Feedback với các sticker
             with tabs[1]:  # Tab Đánh giá/Feedback
                 st.header(tab_titles[1])  # Hiển thị tiêu đề Tab
-                st.write(feedback_message)  # Hiển thị link nhận xét
+                # st.write(feedback_message)  # Hiển thị link nhận xét
 
 
                 # Tải ảnh và mã hóa base64
@@ -2431,31 +2497,32 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                 sticker_3 = base64.b64encode(open(sticker_3_path, "rb").read()).decode()
 
                 # Tab Đánh giá
-                st.markdown(
-                    f"""
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-                        <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
-                            <a href="https://not-interested.streamlit.app/" target="_blank">
-                                <img src="data:image/png;base64,{sticker_1}" width="100" style="cursor: pointer;"/>
-                            </a>
-                            <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][0]}</p>
+                with st.expander(feedback_message, expanded=True):
+                    st.markdown(
+                        f"""
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                            <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                <a href="https://not-interested.streamlit.app/" target="_blank">
+                                    <img src="data:image/png;base64,{sticker_1}" width="100" style="cursor: pointer;"/>
+                                </a>
+                                <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][0]}</p>
+                            </div>
+                            <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                <a href="https://mehh-soso.streamlit.app/" target="_blank">
+                                    <img src="data:image/png;base64,{sticker_2}" width="100" style="cursor: pointer;"/>
+                                </a>
+                                <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][1]}</p>
+                            </div>
+                            <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                                <a href="https://good-job.streamlit.app/" target="_blank">
+                                    <img src="data:image/png;base64,{sticker_3}" width="100" style="cursor: pointer;"/>
+                                </a>
+                                <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][2]}</p>
+                            </div>
                         </div>
-                        <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
-                            <a href="https://mehh-soso.streamlit.app/" target="_blank">
-                                <img src="data:image/png;base64,{sticker_2}" width="100" style="cursor: pointer;"/>
-                            </a>
-                            <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][1]}</p>
-                        </div>
-                        <div style="flex: 1; display: flex; justify-content: center; flex-direction: column; align-items: center;">
-                            <a href="https://good-job.streamlit.app/" target="_blank">
-                                <img src="data:image/png;base64,{sticker_3}" width="100" style="cursor: pointer;"/>
-                            </a>
-                            <p style="margin-top: 5px; font-size: 18px; text-align: center;">{texts[language][2]}</p>
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+                        """,
+                        unsafe_allow_html=True,
+                    )
 
             st.write("                         ")
 
@@ -2463,19 +2530,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
 if st.button(f"{refresh_button_label}"):
          st.experimental_set_query_params(reload="true")
 
-# Đặt cờ refresh trong session_state nếu chưa có
-# if 'need_rerun' not in st.session_state:
-#     st.session_state.need_rerun = False
 
-# # Nút Refresh để kích hoạt refresh
-# if st.button(f"{refresh_button_label}"):
-#     st.session_state.need_rerun = True  # Đặt cờ để trigger
-
-# # Nếu cờ được bật, cập nhật nội dung
-# if st.session_state.need_rerun:
-#     st.session_state.need_rerun = False  # Tắt cờ sau khi refresh
-#     # Dùng st.experimental_set_query_params để "giả" refresh
-#     st.experimental_set_query_params(refresh="true")
 
 # Hàm mã hóa ảnh thành chuỗi base64
 def encode_image(image_path):
@@ -2527,33 +2582,6 @@ st.markdown(
         font-size: 18px;
         margin-top: 5px;
     }
-    /* Modal Styles */
-    .modal {
-        display: none; /* Ẩn modal ban đầu */
-        position: fixed;
-        z-index: 11;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-    .modal-content {
-        margin: 15% auto;
-        display: block;
-        width: 80%;
-        max-width: 500px;
-    }
-    .close {
-        position: absolute;
-        top: 20px;
-        right: 35px;
-        color: #fff;
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
-    }
     </style>
     """,
     unsafe_allow_html=True
@@ -2585,27 +2613,6 @@ st.markdown(
         </div>
         <div class="footer-text">{footer_text}</div>
     </div>
-
-    <!-- Modal Popup -->
-    <div id="qrModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage" src="data:image/png;base64,{encoded_qr}">
-    </div>
-    <!-- Modal Popup -->
-    <div id="qrModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" src="data:image/png;base64,{encoded_qr}">
-    </div>
-
-    <script>
-    function openModal() {{
-        document.getElementById("qrModal").style.display = "flex";
-    }}
-
-    function closeModal() {{
-        document.getElementById("qrModal").style.display = "none";
-    }}
-    </script>
     """,
     unsafe_allow_html=True
 )
@@ -2692,7 +2699,9 @@ about_us_vn = """
 
 Chỉ cần nhập vài thông tin cơ bản, Astrotomi sẽ dự đoán xu hướng tài chính của bạn, từ đó đưa ra các gợi ý sản phẩm phù hợp nhất theo nhu cầu có trên ứng dụng Timo.
 
+
 Đã đủ hấp dẫn để bạn thử chưa? Bắt đầu thôi ✨
+
 
 **Lưu ý:** Kết quả Astrotomi chỉ mang tính tham khảo.
 """
@@ -2703,7 +2712,9 @@ about_us_en = """
 
 Just enter a few basic details, and Astrotomi will predict your financial tendencies, then suggest the most suitable products based on your needs within the Timo app.
 
+
 Intrigued enough to give it a try? Let’s get started! ✨
+
 
 **Note:** Astrotomi results are for reference only.
 """
