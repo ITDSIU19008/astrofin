@@ -2402,18 +2402,18 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 unsafe_allow_html=True
                             )
                         
-                            if language == "Tiếng Việt":
-                                st.subheader("Bạn sẽ cần: ")
-                                necessary_df['Score'] = necessary_df['Score'].round(2) 
-                                # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                                necessary_df_display = necessary_df.drop(columns=['Score'])
-                                st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                            else:
-                                st.subheader("You will need: ")
-                                necessary_df['Score'] = necessary_df['Score'].round(2)  
-                                # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                                necessary_df_display = necessary_df.drop(columns=['Score'])
-                                st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            # if language == "Tiếng Việt":
+                            #     st.subheader("Bạn sẽ cần: ")
+                            #     necessary_df['Score'] = necessary_df['Score'].round(2) 
+                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
+                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            # else:
+                            #     st.subheader("You will need: ")
+                            #     necessary_df['Score'] = necessary_df['Score'].round(2)  
+                            #     # st.markdown(necessary_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            #     necessary_df_display = necessary_df.drop(columns=['Score'])
+                            #     st.markdown(necessary_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
                     
                         # Nếu không có trong cache, tạo nội dung sản phẩm mới với GPT
                             eligible_products = eligible_df[['Product', 'Label']].values.tolist()
