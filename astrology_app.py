@@ -1112,12 +1112,15 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
             (top_20_eligible['Score'] >= top_20_eligible.nlargest(5, 'Score')['Score'].min())
         ]
 
-        # Nếu ít nhất 4 sản phẩm con nằm trong top 5, loại bỏ tất cả sản phẩm con
+        # Nếu có ít nhất 4 sản phẩm con trong top 5, loại bỏ tất cả sản phẩm con
         if len(child_products_in_top_5) >= 3:
             top_5_eligible = top_20_eligible[~top_20_eligible['Product'].isin(child_products)]
         else:
             # Nếu không đủ 4 sản phẩm con, giữ lại top 5 theo điểm
             top_5_eligible = top_20_eligible.nlargest(5, 'Score')
+    else:
+        # Nếu không có sản phẩm mẹ nào trong top 20, giữ nguyên top 5 theo điểm
+        top_5_eligible = top_20_eligible.nlargest(5, 'Score')
     else:
         # Nếu không có sản phẩm mẹ nào trong top 20, giữ nguyên top 5 theo điểm
         top_5_eligible = top_20_eligible.nlargest(5, 'Score')
