@@ -1011,152 +1011,44 @@ product_hierarchy = {
         "spending-prediction",
     ]
 }
-# def get_child_products(product_key, language):
-#     if product_key in product_hierarchy:
-#         child_products = product_hierarchy[product_key]
-#         return "\n".join([
-#             f"- {get_product_name(child, language)} _[Link](https://timo.vn/products/{child})_"
-#             for child in child_products
-#         ])
-#     return ""
-# def prepare_eligible_info(eligible_df, language):
-    # Tạo từ điển các sản phẩm chính và sản phẩm con
-    # product_hierarchy = {
-    #     "pfm": [
-    #         "speding-prediction",
-    #         "category-report",
-    #         "cashflow-overview",
-    #         "asset-tracker",
-    #         "tags",
-    #         "setting-budget"
-    #     ]
-    # }
-
-    # # Kiểm tra nếu đầu vào là list và chuyển thành DataFrame nếu cần
-    # if isinstance(eligible_df, list):
-    #     eligible_df = pd.DataFrame(eligible_df, columns=['Product', 'Score', 'Label'])
-
-    # # Lọc và lấy top 5 sản phẩm theo điểm số
-    # filtered_df = eligible_df.nlargest(5, 'Score')
-
-    # # Chuẩn bị thông tin hiển thị
-    # eligible_info = ""
-
-    # # Lặp qua từng sản phẩm trong top 5
-    # for _, row in filtered_df.iterrows():
-    #     product = row['Product']
-    #     product_name = get_product_name(product, language)
-    #     label = row['Label']
-    #     link = f"https://timo.vn/products/{product}"
-
-    #     # Kiểm tra nếu sản phẩm có sản phẩm con trong hierarchy
-    #     if product in product_hierarchy:
-    #         eligible_info += f"{product_name} - {label}\n"
-    #         eligible_info += f"- {product_name}\n  _Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
-    #         eligible_info += f"Sản Phẩm này bao gồm:\n"
-
-    #         # Thêm các sản phẩm con
-    #         for sub_product in product_hierarchy[product]:
-    #             sub_product_name = get_product_name(sub_product, language)
-    #             # sub_link = f"https://timo.vn/products/{sub_product}"
-    #             eligible_info += f"- {sub_product_name}: {label}\n"
-
-    #     else:
-    #         # Nếu không có sản phẩm con, chỉ hiển thị sản phẩm chính
-    #         eligible_info += f"- {product_name} - {label}\n"
-    #         eligible_info += f"  _Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
-
-    #     eligible_info += "\n"  # Thêm khoảng trắng giữa các sản phẩm
-
-    # return eligible_info
-
-# #  Kiểm tra nếu đầu vào là list và chuyển thành DataFrame nếu cần
-#     child_products = set(
-#         product for products in product_hierarchy.values() for product in products
-#     )
-
-#     # Lọc và lấy top 5 sản phẩm theo điểm số
-#     filtered_df = eligible_df.nlargest(5, 'Score')
-
-#     # Kiểm tra nếu sản phẩm chính có trong top 5 và loại bỏ các sản phẩm con khỏi danh sách
-#     main_products_df = filtered_df[
-#         ~filtered_df['Product'].isin(child_products)
-#     ]
-
-#     # Nếu sản phẩm chính (như 'pfm') có trong danh sách, thêm các sản phẩm con vào hiển thị
-#     eligible_info = ""
-#     for _, row in main_products_df.iterrows():
-#         product = row['Product']
-#         product_name = get_product_name(product, language)
-#         label = row['Label']
-#         link = f"https://timo.vn/products/{product}"
-
-#         # Kiểm tra nếu sản phẩm chính có các sản phẩm con
-#         if product in product_hierarchy:
-#             eligible_info += f"{product_name} - {label}\n"
-#             eligible_info += "**Sản phẩm này bao gồm:**\n"
-
-#             # Thêm các sản phẩm con vào hiển thị
-#             for sub_product in product_hierarchy[product]:
-#                 sub_product_name = get_product_name(sub_product, language)
-#                 # sub_link = f"https://timo.vn/products/{sub_product}"
-#                 eligible_info += f"- {sub_product_name}: {label}\n"
-#                 # eligible_info += f"  _Bạn có thể tìm hiểu thêm tại [Link]({sub_link})_\n"
-
-#         else:
-#             # Nếu không có sản phẩm con, hiển thị sản phẩm chính
-#             eligible_info += f"### {product_name} - {label}\n"
-#             eligible_info += f"_Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
-
-#         eligible_info += "\n"  # Thêm khoảng trắng giữa các sản phẩm
-
-#     return eligible_info
 
 def prepare_eligible_info(eligible_df, language, product_hierarchy):
-    # Tập hợp tất cả sản phẩm con để loại bỏ nếu sản phẩm chính đã được chọn
-    child_products = set(
-        product for products in product_hierarchy.values() for product in products
-    )
-
-    # Lọc và lấy top 5 sản phẩm theo điểm số
-    filtered_df = eligible_df.nlargest(5, 'Score')
-
-    # Lọc ra danh sách chỉ chứa sản phẩm chính (bỏ sản phẩm con nếu đã có sản phẩm chính)
-    main_products_df = filtered_df[~filtered_df['Product'].isin(child_products)]
-
+    child_products = set(product for products in product_hierarchy.values() for product in products)
     eligible_info = ""
-    for _, row in main_products_df.iterrows():
+
+    # Duyệt qua từng sản phẩm trong DataFrame
+    for _, row in eligible_df.iterrows():
         product = row['Product']
         product_name = get_product_name(product, language)
         label = row['Label']
-        link = f"https://timo.vn/products/{product}"
 
-        # Kiểm tra nếu sản phẩm chính có các sản phẩm con
+        # Chọn URL dựa trên ngôn ngữ
+        if language == "Tiếng Việt":
+            link = f"https://timo.vn/product/{product}"
+        else:
+            link = f"https://timo.vn/en/{product}"
+
+        # Kiểm tra nếu sản phẩm là sản phẩm mẹ và có sản phẩm con
         if product in product_hierarchy:
-            eligible_info += f"{product_name} - {label}\n"
+            eligible_info += f"**{product_name}** - {label}\n"
             eligible_info += f"_Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
-            eligible_info += "  **Sản phẩm này bao gồm:**"
-            
-            # Lấy sản phẩm con từ DataFrame và sắp xếp theo điểm số
-            child_df = eligible_df[
-                eligible_df['Product'].isin(product_hierarchy[product])
-            ].sort_values(by='Score', ascending=False)
+            eligible_info += "  **Sản phẩm này bao gồm:**\n"
 
-            # Thêm các sản phẩm con vào hiển thị
+            # Lấy và hiển thị các sản phẩm con theo thứ tự điểm số
+            child_df = eligible_df[eligible_df['Product'].isin(product_hierarchy[product])].sort_values(by='Score', ascending=False)
             for _, child_row in child_df.iterrows():
-                sub_product_name = get_product_name(child_row['Product'], language)
-                sub_label = child_row['Label']
-                eligible_info += f"     - {sub_product_name}\n"
-
+                child_name = get_product_name(child_row['Product'], language)
+                child_label = child_row['Label']
+                eligible_info += f"    - {child_name}: {child_label}\n"
         else:
             # Nếu không có sản phẩm con, hiển thị sản phẩm chính
-            eligible_info += f"{product_name} - {label}\n"
+            eligible_info += f"**{product_name}** - {label}\n"
             eligible_info += f"_Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
 
         eligible_info += "\n"  # Thêm khoảng trắng giữa các sản phẩm
 
     return eligible_info
-
+    
 
 
 # Lấy top 5 sản phẩm từ bảng eligible
@@ -1179,13 +1071,21 @@ def prepare_necessary_info(necessary_df, eligible_df):
     # Nếu không còn sản phẩm cần thiết, trả về None
     if filtered_necessary_df.empty:
         return None
+    
+     # Chuẩn bị thông tin sản phẩm cần thiết sau khi lọc
+    necessary_info = ""
+    for _, row in filtered_necessary_df.iterrows():
+        product = row['Product']
+        product_name = get_product_name(product, language)
+        label = row['Label']
 
-    # Chuẩn bị thông tin sản phẩm cần thiết sau khi lọc
-    necessary_info = "\n".join([
-        f"- {get_product_name(row['Product'], language)}: {row['Label']} "
-        f"_Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/{row['Product']})_"
-        for _, row in filtered_necessary_df.iterrows()
-    ])
+        link = f"https://timo.vn/product/{product}" if language == "Tiếng Việt" else f"https://timo.vn/en/{product}"
+
+        if language == "Tiếng Việt":
+            necessary_info += f"- {product_name}: {label} _Bạn có thể tìm hiểu thêm tại [Link]({link})_\n"
+        else:
+            necessary_info += f"- {product_name}: {label} _Learn more at [Link]({link})_\n"
+
 
     return necessary_info
 
@@ -1194,13 +1094,14 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
     # Tạo template từ file
     prompt_template = load_prompt_from_file('product_prompt_template.txt')
 
-    # Chuẩn bị danh sách sản phẩm mở rộng
-    eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
-
     # Tập hợp tất cả các sản phẩm con
     child_products = set(
         product for products in product_hierarchy.values() for product in products
     )
+
+    # Chuẩn bị danh sách sản phẩm mở rộng
+    eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
+
     top_5_eligible = eligible_df
     # Kiểm tra nếu sản phẩm mẹ nằm trong top 5
     parent_in_top_5 = set(top_5_eligible['Product']).intersection(product_hierarchy.keys())
@@ -1220,13 +1121,11 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
         for i, row in top_5_eligible.iterrows()
     ])
 
-
-
     # Chuẩn bị thông tin về traits
     traits_info = []
     for trait, score in final_scores.items():
-        result = determine_score_level_and_description(trait, score)  # Trả về 2 giá trị (level, description)
-        if isinstance(result, tuple) and len(result) == 2:  # Kiểm tra nếu kết quả có đúng 2 phần tử
+        result = determine_score_level_and_description(trait, score)  # Trả về (level, description)
+        if isinstance(result, tuple) and len(result) == 2:
             level, description = result
             traits_info.append(f"Trait: {trait}, Score: {score} ({level}) - {description}")
         else:
@@ -1250,8 +1149,6 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
 
 
 
-
-
 # Tạo nội dung cho sản phẩm cần thiết nếu có
 def generate_recommendation_for_necessary(necessary_df, eligible_df, final_scores, language, age):
     # Chuẩn bị thông tin cần thiết sau khi lọc
@@ -1265,10 +1162,15 @@ def generate_recommendation_for_necessary(necessary_df, eligible_df, final_score
     tone, age_group = adjust_tone_based_on_age(age)
 
     # Chuẩn bị nội dung top 3 traits để điền vào prompt
-    traits_info = [
-        f"Trait: {trait}, Score: {final_scores[trait]:.2f}"
-        for trait in sorted(final_scores, key=final_scores.get, reverse=True)[:3]
-    ]
+    traits_info = []
+    for trait, score in final_scores.items():
+        result = determine_score_level_and_description(trait, score)  # Hàm phải trả về tuple (level, description)
+
+        if isinstance(result, tuple) and len(result) == 2:
+            level, description = result
+            traits_info.append(f"Trait: {trait}, Score: {score} ({level}) - {description}")
+        else:
+            raise ValueError(f"Unexpected return from determine_score_level_and_description: {result}")
 
     prompt = prompt_template.format(
         traits_info='\n'.join(traits_info),
@@ -1277,8 +1179,9 @@ def generate_recommendation_for_necessary(necessary_df, eligible_df, final_score
         tone=tone,
         age_group=age_group
     )
-
+    print(generate_recommendation_for_eligible(eligible_df, final_scores, "Tiếng Việt", 30, product_hierarchy))
     return generate_content_with_gpt(prompt)
+
 
 
 # -----------------HỆ THỐNG ĐIỂM PRODUCT-----------------------------------------------------------------------
@@ -2077,6 +1980,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                     st.session_state.user_hash = load_user_hash()
 
             # with tabs[1]:
+                st.write("                         ")
                 if not birth_place.strip():
                     # Nếu thiếu nơi sinh, hiển thị thông báo lỗi và dừng các thao tác khác
                     if language == "Tiếng Việt":
@@ -2324,7 +2228,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 unsafe_allow_html=True
                             )
                             # Giả lập quá trình xử lý báo cáo (ví dụ: chạy một số logic phức tạp)
-                            time.sleep(20)  # Thay bằng logic tạo báo cáo thực tế
+                            time.sleep(10)  # Thay bằng logic tạo báo cáo thực tế
 
                             # Tính thời gian xử lý
                             end_time = time.time()
@@ -2589,9 +2493,9 @@ st.markdown(
 
 # Nội dung cho từng ngôn ngữ
 footer_text = (
-    "Tải ứng dụng ngay để trải nghiệm sản phẩm được gợi ý bởi Astrotomi!."
+    "Tải ứng dụng ngay để trải nghiệm sản phẩm được gợi ý bởi Astrotomi!"
     if language == "Tiếng Việt"
-    else "Download the app now to try our products recommended by Astrotomi!."
+    else "Download the app now to try our products recommended by Astrotomi!"
 )
 
 # HTML hiển thị QR code và các nút tải app theo bố cục
