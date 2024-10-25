@@ -2464,8 +2464,8 @@ if st.button(f"{refresh_button_label}"):
          st.experimental_set_query_params(reload="true")
 
 # Đặt cờ refresh trong session_state nếu chưa có
-if 'need_rerun' not in st.session_state:
-    st.session_state.need_rerun = False
+# if 'need_rerun' not in st.session_state:
+#     st.session_state.need_rerun = False
 
 # # Nút Refresh để kích hoạt refresh
 # if st.button(f"{refresh_button_label}"):
