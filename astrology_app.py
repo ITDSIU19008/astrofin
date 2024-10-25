@@ -1101,23 +1101,33 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
     top_20_eligible = eligible_df.nlargest(10, 'Score')
 
     # Kiểm tra nếu sản phẩm mẹ nằm trong top 20
-    parent_in_top_20 = set(top_20_eligible['Product']).intersection(product_hierarchy.keys())
+    parents_in_top_20 = set(top_20_eligible['Product']).intersection(product_hierarchy.keys())
 
-    # Nếu sản phẩm mẹ nằm trong top 20, xử lý sản phẩm con
-    if parent_in_top_20:
-        # Lọc các sản phẩm con có nhãn "Rất phù hợp" hoặc "Phù hợp"
-        child_products_in_top_5 = top_20_eligible[
-            (top_20_eligible['Product'].isin(child_products)) &
-            (top_20_eligible['Label'].isin(["Rất phù hợp", "Phù hợp","Very Suitable","Suitable","Cần thiết - Rất phù hợp", "Cần thiết - Phù hợp","Necessary - Very Suitable","Necessary - Suitable"])) &
-            (top_20_eligible['Score'] >= top_20_eligible.nlargest(5, 'Score')['Score'].min())
-        ]
+    if parents_in_top_20:
+        # Kiểm tra nếu sản phẩm mẹ cũng nằm trong top 5
+        parent_in_top_5 = top_20_eligible.nlargest(5, 'Score')['Product'].isin(parents_in_top_20).any()
 
-        # Nếu có ít nhất 4 sản phẩm con trong top 5, loại bỏ tất cả sản phẩm con
-        if len(child_products_in_top_5) >= 3:
+        if parent_in_top_5:
+            # Loại bỏ tất cả sản phẩm con khỏi top 5 nếu mẹ có trong top 5
             top_5_eligible = top_20_eligible[~top_20_eligible['Product'].isin(child_products)]
         else:
-            # Nếu không đủ 4 sản phẩm con, giữ lại top 5 theo điểm
-            top_5_eligible = top_20_eligible.nlargest(5, 'Score')
+            # Lọc các sản phẩm con có nhãn "Rất phù hợp" hoặc "Phù hợp"
+            child_products_in_top_5 = top_20_eligible[
+                (top_20_eligible['Product'].isin(child_products)) &
+                (top_20_eligible['Label'].isin([
+                    "Rất phù hợp", "Phù hợp", "Very Suitable", "Suitable",
+                    "Cần thiết - Rất phù hợp", "Cần thiết - Phù hợp",
+                    "Necessary - Very Suitable", "Necessary - Suitable"
+                ])) &
+                (top_20_eligible['Score'] >= top_20_eligible.nlargest(5, 'Score')['Score'].min())
+            ]
+
+            # Nếu có ít nhất 4 sản phẩm con trong top 5, loại bỏ tất cả sản phẩm con
+            if len(child_products_in_top_5) >= 3:
+                top_5_eligible = top_20_eligible[~top_20_eligible['Product'].isin(child_products)]
+            else:
+                # Nếu không đủ 4 sản phẩm con, giữ lại top 5 theo điểm
+                top_5_eligible = top_20_eligible.nlargest(5, 'Score')
     else:
         # Nếu không có sản phẩm mẹ nào trong top 20, giữ nguyên top 5 theo điểm
         top_5_eligible = top_20_eligible.nlargest(5, 'Score')
