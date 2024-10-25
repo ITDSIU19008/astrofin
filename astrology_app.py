@@ -1099,18 +1099,32 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
         product for products in product_hierarchy.values() for product in products
     )
 
+    # Lấy danh sách top 20 sản phẩm theo điểm để kiểm tra
+    top_20_eligible = eligible_df.nlargest(10, 'Score')
+
+    # Kiểm tra nếu sản phẩm mẹ nằm trong top 10
+    parent_in_top_20 = set(top_20_eligible['Product']).intersection(product_hierarchy.keys())
+
+    # Nếu sản phẩm mẹ có trong top 20, kiểm tra số lượng sản phẩm con nằm trong top 5
+    if parent_in_top_20:
+        # Lọc ra các sản phẩm con nằm trong top 5
+        child_products_in_top_5 = top_20_eligible[
+            (top_20_eligible['Product'].isin(child_products)) & 
+            (top_20_eligible['Score'] >= top_20_eligible.nlargest(5, 'Score')['Score'].min())
+        ]
+
+        # Nếu có ít nhất 4 sản phẩm con trong top 5, loại bỏ tất cả sản phẩm con
+        if len(child_products_in_top_5) >= 4:
+            top_5_eligible = top_20_eligible[~top_20_eligible['Product'].isin(child_products)]
+        else:
+            # Nếu không đủ 4 sản phẩm con, giữ lại top 5 theo điểm
+            top_5_eligible = top_20_eligible.nlargest(5, 'Score')
+    else:
+        # Nếu không có sản phẩm mẹ nào trong top 20, giữ nguyên top 5 theo điểm
+        top_5_eligible = top_20_eligible.nlargest(5, 'Score')
+
     # Chuẩn bị danh sách sản phẩm mở rộng
     eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
-
-    top_5_eligible = eligible_df.nlargest(20, 'Score')
-    # Kiểm tra nếu sản phẩm mẹ nằm trong top 5
-    parent_in_top_5 = set(top_5_eligible['Product']).intersection(product_hierarchy.keys())
-
-    # Loại bỏ các sản phẩm con khỏi top 5 nếu sản phẩm mẹ đã có trong top 5
-    if parent_in_top_5:
-        top_5_eligible = top_5_eligible[~top_5_eligible['Product'].isin(child_products)]
-    else:
-        top_5_eligible = eligible_df.nlargest(5, 'Score')
 
     # Chuẩn bị danh sách top 5 sản phẩm để hiển thị
     top_5_eligible_info = "\n".join([
