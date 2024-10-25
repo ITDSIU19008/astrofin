@@ -2324,7 +2324,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 unsafe_allow_html=True
                             )
                             # Giả lập quá trình xử lý báo cáo (ví dụ: chạy một số logic phức tạp)
-                            time.sleep(60)  # Thay bằng logic tạo báo cáo thực tế
+                            time.sleep(20)  # Thay bằng logic tạo báo cáo thực tế
 
                             # Tính thời gian xử lý
                             end_time = time.time()
