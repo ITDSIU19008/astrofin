@@ -1099,21 +1099,19 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
         product for products in product_hierarchy.values() for product in products
     )
 
-    # Chuẩn bị danh sách sản phẩm mở rộng
-    eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
+    # Kiểm tra xem có sản phẩm mẹ nào trong top 5 không
+    filtered_df = eligible_df.nlargest(5, 'Score')  # Lấy top 5 sản phẩm
+    parent_in_top_5 = set(filtered_df['Product']).intersection(product_hierarchy.keys())
 
-    top_5_eligible = eligible_df
-    # Kiểm tra nếu sản phẩm mẹ nằm trong top 5
-    parent_in_top_5 = set(top_5_eligible['Product']).intersection(product_hierarchy.keys())
-
-    # Loại bỏ các sản phẩm con khỏi top 5 nếu sản phẩm mẹ đã có trong top 5
+    # Nếu sản phẩm mẹ nằm trong top 5, loại bỏ các sản phẩm con khỏi danh sách top 5
     if parent_in_top_5:
-        top_5_eligible = top_5_eligible[~top_5_eligible['Product'].isin(child_products)]
+        top_5_eligible = filtered_df[~filtered_df['Product'].isin(child_products)]
     else:
-        top_5_eligible = eligible_df.nlargest(5, 'Score')
+        # Nếu không có sản phẩm mẹ nào trong top 5, lấy đúng top 5 sản phẩm
+        top_5_eligible = filtered_df
 
-    # top_5_eligible = eligible_df[~eligible_df['Product'].isin(child_products)]
-    # top_5_eligible = top_5_eligible.nlargest(5, 'Score')
+    # Chuẩn bị danh sách sản phẩm mẹ và các sản phẩm con
+    eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
 
     # Chuẩn bị danh sách top 5 sản phẩm để hiển thị
     top_5_eligible_info = "\n".join([
@@ -1146,6 +1144,7 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
 
     # Gọi hàm GPT để sinh nội dung từ prompt
     return generate_content_with_gpt(prompt)
+
 
 
 
