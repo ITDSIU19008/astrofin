@@ -1108,7 +1108,7 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
         # Lọc các sản phẩm con có nhãn "Rất phù hợp" hoặc "Phù hợp"
         child_products_in_top_5 = top_20_eligible[
             (top_20_eligible['Product'].isin(child_products)) &
-            (top_20_eligible['Label'].isin(["Rất phù hợp", "Phù hợp","Very Suitable","Suitable","Cần thiết - Rất phù hợp", "Cần thiết - Phù hợp","Necessary - Very Suitable",""Necessary - Suitable"])) &
+            (top_20_eligible['Label'].isin(["Rất phù hợp", "Phù hợp","Very Suitable","Suitable","Cần thiết - Rất phù hợp", "Cần thiết - Phù hợp","Necessary - Very Suitable","Necessary - Suitable"])) &
             (top_20_eligible['Score'] >= top_20_eligible.nlargest(5, 'Score')['Score'].min())
         ]
 
