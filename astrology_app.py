@@ -2307,18 +2307,18 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                                 unsafe_allow_html=True
                             )
                         
-                        # if language == "Tiếng Việt":
-                        #     st.subheader("Bạn sẽ thích: ")
-                        #     eligible_df['Score'] = eligible_df['Score'].round(2)
-                        #     # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                        #     eligible_df_display = eligible_df.drop(columns=['Score'])
-                        #     st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
-                        # else:
-                        #     st.subheader("Your matches:")
-                        #     eligible_df['Score'] = eligible_df['Score'].round(2)  
-                        #     # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
-                        #     eligible_df_display = eligible_df.drop(columns=['Score'])
-                        #     st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        if language == "Tiếng Việt":
+                            st.subheader("Bạn sẽ thích: ")
+                            eligible_df['Score'] = eligible_df['Score'].round(2)
+                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            eligible_df_display = eligible_df.drop(columns=['Score'])
+                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
+                        else:
+                            st.subheader("Your matches:")
+                            eligible_df['Score'] = eligible_df['Score'].round(2)  
+                            # st.markdown(eligible_df.to_html(classes='custom-table'), unsafe_allow_html=True)
+                            eligible_df_display = eligible_df.drop(columns=['Score'])
+                            st.markdown(eligible_df_display.to_html(classes='custom-table'), unsafe_allow_html=True)
                         
                         st.write("                         ")
 
