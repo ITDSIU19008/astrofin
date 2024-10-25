@@ -30,7 +30,7 @@ Beyond the products that suit you, here are some additional ones you may need to
 2. **Sản phẩm cần thiết:** Nếu sản phẩm có nhãn "Cần thiết", hãy liệt kê riêng, giải thích tại sao khách hàng nên sử dụng, ngay cả khi họ có thể ít có hứng thú với sản phẩm đó.  
 3. Giọng văn: {tone}, nhắm đến đối tượng: {age_group}.
 4. Với mỗi sản phẩm, hãy thêm liên kết cuối mỗi mô tả:  
-   _Bạn có thể tìm hiểu thêm tại/ You can learn more about this at [Link](https://timo.vn/products/..._
+   _Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/product/... You can learn more about this at [Link](https://timo.vn/en/...
 5.**nếu ngôn ngữ = {language}, dùng tên {language} của sản phẩm đó, ví dụ Money Pot: Hũ Chi Tiêu, Term Deposit: Tài Khoản Tiết Kiệm,...**
 6. **Nếu Ngôn Ngữ là {language}, cần sử dụng thuần {language} toàn bộ văn bản**
 7. ** chỉ lấy các sản phẩm trong {necessary_products} (không cần đề cập tới label) để viết bài

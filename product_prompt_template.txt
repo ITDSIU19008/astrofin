@@ -35,26 +35,37 @@ ví dụ tiếng anh: Based on your prominent personality traits such as ** firs
 
 - **Tiếng Việt:**  
   **Hũ Chi Tiêu (Money Pot)** - Giúp bạn...  
-  _Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/money-pot)_  
+  _Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/product/...)_  
 
 - **English:**  
   **Money Pot (Hũ Chi Tiêu)** - Helps you...  
-  _Learn more about this at [Link](https://timo.vn/products/money-pot)_
+  _Learn more about this at [Link(https://timo.vn/en/...)_
 
 1. ** lấy đủ top 5 sản phẩm trong {top_5_eligible_products} để viết bài.**
 
 Nếu một sản phẩm có các sản phẩm con, chúng sẽ được liệt kê bên dưới với mô tả phù hợp. Ví dụ:
 **Quản Lý Tài Chính Cá Nhân (Personal Financial Management)**: Sản phẩm này giúp bạn...
-**Sản phẩm này bao gồm: (liệt kể dủ các sản phẩm con kèm mô tả của chúng)**
-        ví dụ:
-   (lùi ô để thể hiện được đây là sản phẩm con)     - **Dự Đoán Thu Chi (Spending Prediction):** Giúp bạn...
-   (lùi ô để thể hiện được đây là sản phẩm con)       - **Báo Cáo Thu Chi (Cashflow Report):** _Mô tả...
-    (lùi ô để thể hiện được đây là sản phẩm con)      tương tự **{eligible_products}:** _mô tả...
+**Sản phẩm này bao gồm: (liệt kể dủ các sản phẩm con kèm mô tả của chúng product_hierarchy = 
+    "pfm": [
+        "tags",
+        "setting-budget",
+        "category-report",
+        "cashflow-overview",
+        "asset-tracker",
+        "spending-prediction",
+    ]
+)**
+        ví dụ: (nên theo thứ tự điểm số cao đến thấp)
+   (lùi ô để thể hiện được đây là sản phẩm con)     **Báo Cáo Thu Chi (Cashflow Report):** Giúp bạn...
+   (lùi ô để thể hiện được đây là sản phẩm con)     **Gắn Nhãn Giao Dịch (Transaction Tags):** _Mô tả...
+    (lùi ô để thể hiện được đây là sản phẩm con)     tương tự **{eligible_products}:** _mô tả...
 sản phẩm con cuối cùng phải cách hàng \n\n
+link của Personal Financial Management được viết tắt là pfm
 
 2. **Sản phẩm phù hợp:** **Danh sách các sản phẩm phù hợp lấy từ {top_5_eligible_products} và {traits_info}, nêu bật lợi ích chính và lý do tại sao khách hàng sẽ thích từng sản phẩm.  **
 3. **Giọng văn:** {tone}, nhắm đến đối tượng: {age_group}.
-4. **Chèn liên kết:** Với mỗi sản phẩm, hãy thêm liên kết cuối mỗi mô tả như sau:  
+4. **Chèn liên kết:** Sản phẩm con không chèn liên kết**
+**Với mỗi sản phẩm khác san phẩm con, hãy thêm liên kết cuối mỗi mô tả như sau:  
    _Bạn có thể tìm hiểu thêm tại/ learn more about this at [Link](https://...)_
 5. **nếu ngôn ngữ = {language}, chỉ dùng tên {language} của sản phẩm đó, ví dụ Money Pot: Hũ Chi Tiêu, Overdraft: Thấu Chi,...**
 6. **Nếu Ngôn Ngữ là {language}, cần sử dụng thuần {language} toàn bộ văn bản**
@@ -62,9 +73,9 @@ sản phẩm con cuối cùng phải cách hàng \n\n
 
 - **Tiếng Việt:**  
   **Hũ Chi Tiêu (Money Pot)**  Sản phẩm này giúp bạn...  
-  _Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/products/money-pot)_  
+  _Bạn có thể tìm hiểu thêm tại [Link](https://timo.vn/product/hu-chi-tieu)_  
 
 - **English:**  
   **Money Pot (Hũ Chi Tiêu)**  This product helps you...  
-  _Learn more about this at [Link](https://timo.vn/products/money-pot)_
+  _Learn more about this at [Link](https://timo.vn/en/money-pot)_
 
