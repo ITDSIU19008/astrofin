@@ -1121,10 +1121,7 @@ def generate_recommendation_for_eligible(eligible_df, final_scores, language, ag
     else:
         # Nếu không có sản phẩm mẹ nào trong top 20, giữ nguyên top 5 theo điểm
         top_5_eligible = top_20_eligible.nlargest(5, 'Score')
-    else:
-        # Nếu không có sản phẩm mẹ nào trong top 20, giữ nguyên top 5 theo điểm
-        top_5_eligible = top_20_eligible.nlargest(5, 'Score')
-
+        
     # Chuẩn bị danh sách sản phẩm mở rộng
     eligible_info = prepare_eligible_info(eligible_df, language, product_hierarchy)
 
