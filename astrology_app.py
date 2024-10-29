@@ -32,9 +32,9 @@ st.markdown(
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
+
       gtag('config', 'G-XMD7JN83E8');
-</script>
+    </script>
     """,
     unsafe_allow_html=True
 )
