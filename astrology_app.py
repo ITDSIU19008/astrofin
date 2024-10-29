@@ -25,14 +25,14 @@ import base64
 import streamlit.components.v1 as components
 
 st.markdown(
-    f"""
+    """
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-{465145374}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){{dataLayer.push(arguments);}}
+      function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-{465145374}');
+      gtag('config', 'G-12K3X62RX9');
     </script>
     """,
     unsafe_allow_html=True
