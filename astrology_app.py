@@ -1468,6 +1468,16 @@ if "calculate_pressed" not in st.session_state:
 # Streamlit UI
 st.markdown(
     """
+    <div style="text-align: center;  margin-bottom: 50px;">
+        <img src="https://timo.vn/wp-content/uploads/2024/10/AstroTomi_Blog-web_VN.jpg" 
+             alt="AstroTomi Header" style="width:100%; max-width:700px;height:300px; object-fit: cover;">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    """
     <style>
     .emoji {
         font-size: 50px;
@@ -1482,6 +1492,10 @@ st.markdown(
         -webkit-background-clip: text;
         color: transparent;
         margin: 0 10px;
+        margin-bottom: -40px; /* Giảm khoảng cách giữa tiêu đề và expander */
+    }
+    .expander {
+        margin-top: -30px; /* Điều chỉnh khoảng cách phía trên của expander */
     }
     .beta {
         font-size: 20px;
@@ -1493,7 +1507,7 @@ st.markdown(
         display: flex;
         justify-content: center;
         align-items: center;
-        # margin-bottom: 100px; /* Điều chỉnh khoảng cách giữa tiêu đề và tab */
+        # margin-bottom: 80px; /* Điều chỉnh khoảng cách giữa tiêu đề và tab */
     }
 
     /* Điều chỉnh khoảng cách tab */
