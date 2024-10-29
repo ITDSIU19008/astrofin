@@ -26,7 +26,7 @@ import streamlit.components.v1 as components
 
 st.markdown(
     """
-    <!-- Google tag (gtag.js) -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://www.googletagmanager.com;">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
