@@ -2191,7 +2191,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         st.write("                         ")
                         if necessary_content:
                             st.write("### Tôi nên sử dụng sản phẩm nào để tối ưu tài chính?" if language == "Tiếng Việt" else "### Which product should I use to optimize my finances?")
-                            with st.expander("**Theo Tomi thì...**" if language == "Tiếng Việt" else "**From Tomi aspect... **", expanded=True):
+                            with st.expander("**Theo Tomi thì...**" if language == "Tiếng Việt" else "**From Tomi aspect...**", expanded=True):
                                 # st.write(necessary_content)
                                 st.markdown(
                                 f"""
@@ -2388,7 +2388,7 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                          # Chỉ hiển thị nếu có sản phẩm cần thiết
                         if necessary_content:
                             st.write("### Tôi nên sử dụng sản phẩm nào để tối ưu tài chính?" if language == "Tiếng Việt" else "### Which product should I use to optimize my finances?")
-                            with st.expander("**Theo Tomi thì...**" if language == "Tiếng Việt" else "**From Tomi aspect... **", expanded=True):
+                            with st.expander("**Theo Tomi thì...**" if language == "Tiếng Việt" else "**From Tomi aspect...**", expanded=True):
                                 # st.write(necessary_content)
                                 st.markdown(
                                 f"""
