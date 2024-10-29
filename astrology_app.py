@@ -22,6 +22,22 @@ import geopy
 from sklearn.preprocessing import MinMaxScaler
 from unidecode import unidecode
 import base64
+import streamlit.components.v1 as components
+
+# Mã Google Analytics với ID của bạn
+GA_JS = """
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-12K3X62RX9');
+</script>
+"""
+
+# Chèn mã Google Analytics vào ứng dụng
+components.html(GA_JS, height=0)
+
 
 # Đường dẫn tương đối tới thư mục ephemeris (trong cùng thư mục với file Python chính)
 relative_ephe_path = os.path.join(os.path.dirname(__file__), 'sweph')
@@ -2730,6 +2746,8 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True
 )
+
+
 
 
 # # Hàm kiểm tra đăng nhập admin
