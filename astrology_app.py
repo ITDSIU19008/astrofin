@@ -24,7 +24,6 @@ from unidecode import unidecode
 import base64
 import streamlit.components.v1 as components
 
-# Mã Google Analytics với ID của bạn
 GA_JS = """
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
 <script>
