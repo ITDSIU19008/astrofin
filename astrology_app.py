@@ -2199,7 +2199,9 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         sticker_1 = base64.b64encode(open(sticker_1_path, "rb").read()).decode()
                         sticker_2 = base64.b64encode(open(sticker_2_path, "rb").read()).decode()
                         sticker_3 = base64.b64encode(open(sticker_3_path, "rb").read()).decode()
-
+                        
+                        st.write("                         ")
+                        st.write("### Đánh Giá" if language == "Tiếng Việt" else "### Feedback")
                         # Tab Đánh giá
                         with st.expander(feedback_message, expanded=True):
                             st.markdown(
@@ -2399,7 +2401,10 @@ if st.button(f"✨ {calculate_button_label} ✨"):
                         sticker_1 = base64.b64encode(open(sticker_1_path, "rb").read()).decode()
                         sticker_2 = base64.b64encode(open(sticker_2_path, "rb").read()).decode()
                         sticker_3 = base64.b64encode(open(sticker_3_path, "rb").read()).decode()
-
+                        
+                        st.write("                         ")
+                        st.write("### Đánh Giá" if language == "Tiếng Việt" else "### Feedback")
+                        
                         # Tab Đánh giá
                         with st.expander(feedback_message, expanded=True):
                             st.markdown(
