@@ -1968,12 +1968,12 @@ if st.button(f"✨ {calculate_button_label} ✨"):
             # tab1, tab2, tab3, tab4 = st.tabs(["Astrology", "Financial Traits", "Product Recommendations", "Rating"])
             # Thay đổi tên các tab theo ngôn ngữ
             if language == "Tiếng Việt":
-                tab_titles = ["Tính Cách Tài Chính", "Đánh giá"]
+                tab_titles = ["Tính Cách Tài Chính", "✨Đánh giá✨"]
                 # rating_label = "Đánh giá ứng dụng từ 1 đến 5 sao"
                 # comment_label = "Bình luận về ứng dụng"
                 feedback_message = "### Hãy giúp Tomi chọn mức độ hài lòng mà bạn cảm thấy khi trải nghiệm bản beta của ASTROTOMI nha!"
             else:
-                tab_titles = ["Financial Traits", "Feedback"]
+                tab_titles = ["Financial Traits", "✨Feedback✨"]
                 # rating_label = "Rate the app from 1 to 5 stars"
                 # comment_label = "Comment on the app"
                 feedback_message = "### Please help Tomi select how you feel about the ASTROTOMI beta experience!"
