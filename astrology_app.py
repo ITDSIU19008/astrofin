@@ -1566,18 +1566,17 @@ st.markdown(
      /* Tạo lớp phủ nền riêng biệt */
     .bg-container {
         position: fixed;
-        top:10;
-        bottom:10;
-        left: 0; /* Căn hình về bên phải */
-        width: 45%;  /* Đặt chiều rộng phù hợp để chiếm 1 phần màn hình */
-        height: 100%;
+        bottom: -170px;  /* Đặt ở cạnh dưới của màn hình */
+        left: -100px;  /* Căn về góc trái */
+        width: 800px;  /* Tăng kích thước ảnh lên */
+        height: 800px;  /* Giữ tỷ lệ phù hợp */
         background-image: url('https://chiemtinhlaso.com/assets/images/hand_bg.png');
-        background-size: contain;  /* Giữ tỉ lệ của hình ảnh */
-        background-position: left bottom;  /* Căn hình về bên phải và giữa theo chiều dọc */
-        background-repeat: no-repeat;  /* Không lặp lại hình ảnh */
-        opacity: 0.5;  /* Độ trong suốt */
-        animation: rotate-bg 3600s infinite linear;  /* Animation xoay vòng */
-        pointer-events: none;  /* Ngăn người dùng tương tác với hình nền */
+        background-size: contain;  /* Giữ nguyên tỷ lệ ảnh */
+        background-position: left bottom;  /* Đặt ở góc trái dưới */
+        background-repeat: no-repeat;  /* Không lặp lại ảnh */
+        opacity: 0.7;  /* Độ trong suốt */
+        pointer-events: none;  /* Ngăn tương tác của người dùng với ảnh nền */
+        animation: rotate-bg 3600s infinite linear;  /* Xoay ảnh liên tục */
     }
 
     /* Animation xoay vòng cho background */
