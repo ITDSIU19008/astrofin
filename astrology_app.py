@@ -25,20 +25,18 @@ import base64
 import streamlit.components.v1 as components
 
 st.markdown(
-    """
+    f"""
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-{465145374}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag(){{dataLayer.push(arguments);}}
       gtag('js', new Date());
-    
-      gtag('config', 'G-12K3X62RX9');
+      gtag('config', 'G-{465145374}');
     </script>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
-
 
 # Đường dẫn tương đối tới thư mục ephemeris (trong cùng thư mục với file Python chính)
 relative_ephe_path = os.path.join(os.path.dirname(__file__), 'sweph')
