@@ -25,6 +25,7 @@ import base64
 import streamlit.components.v1 as components
 
 GA_JS = """
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -34,7 +35,7 @@ GA_JS = """
 </script>
 """
 
-# Chèn mã Google Analytics vào ứng dụng
+# Chèn mã vào ứng dụng Streamlit
 components.html(GA_JS, height=0)
 
 
