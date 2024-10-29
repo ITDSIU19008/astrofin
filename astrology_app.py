@@ -24,19 +24,19 @@ from unidecode import unidecode
 import base64
 import streamlit.components.v1 as components
 
-GA_JS = """
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-12K3X62RX9');
-</script>
-"""
-
-# Chèn mã vào ứng dụng Streamlit
-components.html(GA_JS, height=0)
+st.markdown(
+    """
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-12K3X62RX9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-12K3X62RX9');
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 # Đường dẫn tương đối tới thư mục ephemeris (trong cùng thư mục với file Python chính)
