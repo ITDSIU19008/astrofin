@@ -1466,21 +1466,21 @@ if "calculate_pressed" not in st.session_state:
 # ----------------------------Streamlit UI---------------------------------------------
 
 # Streamlit UI
-if language == "Tiếng Việt":
-    banner_url = "https://timo.vn/wp-content/uploads/2024/10/AstroTomi_Email-banner_VN.jpg"
-else:
-    banner_url = "https://timo.vn/wp-content/uploads/2024/10/AstroTomi_Email-banner_ENG.jpg"
+# if language == "Tiếng Việt":
+#     banner_url = "https://timo.vn/wp-content/uploads/2024/10/AstroTomi_Email-banner_VN.jpg"
+# else:
+#     banner_url = "https://timo.vn/wp-content/uploads/2024/10/AstroTomi_Email-banner_ENG.jpg"
 
-# CSS để điều chỉnh khoảng cách giữa banner và nội dung
-st.markdown(
-    f"""
-    <div style="text-align: center; margin-bottom: 50px;">
-        <img src="{banner_url}" 
-             alt="AstroTomi Header" style="width:100%; max-width:700px; object-fit: cover;">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# # CSS để điều chỉnh khoảng cách giữa banner và nội dung
+# st.markdown(
+#     f"""
+#     <div style="text-align: center; margin-bottom: 50px;">
+#         <img src="{banner_url}" 
+#              alt="AstroTomi Header" style="width:100%; max-width:700px; object-fit: cover;">
+#     </div>
+#     """,
+#     unsafe_allow_html=True
+# )
 
 st.markdown(
     """
