@@ -1,10 +1,8 @@
 import streamlit as st
 
-# Title for the app
-st.title("Astrotomi nay đã có nhà mới")
 
-# Create a select box for language selection
-language = st.selectbox("Select Language:", ["Tiếng Việt", "English"], index=0)
+# Create a select box for language selection in the sidebar
+language = st.sidebar.selectbox("Select Language:", ["Tiếng Việt", "English"], index=0)
 
 # Check the selected language and display the respective link and quote
 if language == "English":
