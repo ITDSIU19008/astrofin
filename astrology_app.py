@@ -6,7 +6,7 @@ language = st.sidebar.selectbox("Select Language:", ["Tiếng Việt", "English"
 
 # Check the selected language and display the respective link and quote
 if language == "English":
-    st.title("Astrotomi has finally have a new home")
+    st.title("Astrotomi has finally had a new home")
     st.markdown("<h2>Click here to see what the stars say about your financial journey</h2>", unsafe_allow_html=True)
     st.markdown("<h1><a href='https://timo.vn/en/astrotomi/' target='_blank'>Visit AstroTomi</a></h1>", unsafe_allow_html=True)
 elif language == "Tiếng Việt":
